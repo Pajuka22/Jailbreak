@@ -1,7 +1,7 @@
 # Jailbreak
  jeal break game with two characters moving simultaneously
 Controls:
-/n wasd or arrow keys to move
-/n currently, space will switch characters
-/n f to interact
-/n shift to sneak
+wasd or arrow keys to move
+f to interact
+shift to sneak
+space to swap for now, but soon it'll be time based
