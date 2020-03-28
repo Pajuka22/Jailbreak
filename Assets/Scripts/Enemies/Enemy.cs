@@ -48,6 +48,10 @@ public class Enemy : InteractionParent
     // Start is called before the first frame update
     void Start()
     {
+        if(head == null)
+        {
+            head = transform;
+        }
         shouldPickLocks = false;
         startingPoint = transform;
         if(rend == null)
