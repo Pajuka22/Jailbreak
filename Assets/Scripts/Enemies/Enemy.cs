@@ -7,7 +7,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Rigidbody))]
 public class Enemy : InteractionParent
 {
-    public Transform startingPoint;
+    public static bool PlayerLost;
+    public Vector3 startingPoint;
+    public Quaternion startingRot;
     //movement and stuff
     NavMeshAgent navAgent;
     Rigidbody rb;
@@ -45,7 +47,11 @@ public class Enemy : InteractionParent
     bool alerted;
     float time;
     bool waiting;
+    public int framesToCatch = 60;
+    private Coroutine currentCoroutine;
+    int suspicion;
     // Start is called before the first frame update
+    
     void Start()
     {
         if(head == null)
@@ -53,7 +59,8 @@ public class Enemy : InteractionParent
             head = transform;
         }
         shouldPickLocks = false;
-        startingPoint = transform;
+        startingPoint = transform.position;
+        startingRot = transform.rotation;
         if(rend == null)
         {
             rend = GetComponent<Renderer>();
@@ -62,10 +69,18 @@ public class Enemy : InteractionParent
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
         ResetSightCone();
+        navAgent.destination = patrolPoints[0].transform.position;
+        currentPatrolPoint = 0;
     }
-
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //InteractionReset();
+        }
+    }
     // Update is called once per frame
-    void Update()
+    /*void Update()
     {
         //navAgent.destination = patrolPoints[currentPatrolPoint].position;
         switch (currentState)
@@ -81,6 +96,11 @@ public class Enemy : InteractionParent
                 navAgent.destination = alertedPlayer.transform.position;
                 break;
             case EnemyStates.Alerted:
+                if (!(PlayerLost || PlayerBase.firstRun))
+                {
+                    Win();
+                    PlayerLost = true;
+                }
                 break;
         }
         if (alive)
@@ -89,6 +109,10 @@ public class Enemy : InteractionParent
             {
                 if (CanSeePlayer(p))
                 {
+                    if((p.transform.position - transform.position).magnitude < autoAlertRange){
+                        Debug.Log("alerted");
+                        currentState = EnemyStates.Alerted;
+                    }
                     Debug.Log("i see you");
                     if ((p.transform.position - transform.position).magnitude > autoAlertRange && !alerted)
                     {
@@ -99,7 +123,7 @@ public class Enemy : InteractionParent
                         if (PlayerBase.firstRun)
                         {
                             rend.sharedMaterial = caughtMaterial;
-                            ghostState = EnemyStates.Alerted;
+                            currentState = EnemyStates.Alerted;
                         }
                         else
                         {
@@ -114,7 +138,11 @@ public class Enemy : InteractionParent
             }
             
         }
-    }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            InteractionReset();
+        }
+    }*/
     private void FixedUpdate()
     {
         if (PlayerBase.firstRun)
@@ -124,6 +152,85 @@ public class Enemy : InteractionParent
         else
         {
             time--;
+        }
+        float nearestPlayer = sightRange + 1;
+        if (alive)
+        {
+            foreach (PlayerBase p in Players)
+            {
+                if (p.enabled && CanSeePlayer(p))
+                {
+                    if (nearestPlayer > Vector3.Distance(head.position, p.transform.position))
+                    {
+                        nearestPlayer = Vector3.Distance(head.position, p.transform.position);
+                        alertedPlayer = p;
+                    }
+                    if ((p.transform.position - head.position).magnitude <= autoAlertRange)
+                    {
+                        currentState = EnemyStates.Alerted;
+                    }
+                    else
+                    {
+                        currentState = EnemyStates.Suspicious;
+                        navAgent.destination = p.transform.position;
+                    }
+                }
+            }
+            switch (currentState)
+            {
+                case EnemyStates.Idle:
+                    navAgent.speed = 3.5f;
+                    navAgent.angularSpeed = 120;
+                    rend.sharedMaterial = baseMaterial;
+                    if(Vector3.Distance(navAgent.destination, transform.position) <= destinationAcceptanceRadius)
+                    {
+                        currentCoroutine = StartCoroutine(StopAtPatrolPoint());
+                    }
+                    break;
+                case EnemyStates.Suspicious:
+                    navAgent.speed = 2.5f;
+                    navAgent.angularSpeed = 30;
+                    if(currentCoroutine != null)
+                    {
+                        StopCoroutine(currentCoroutine);
+                        currentCoroutine = null;
+                    }
+                    rend.sharedMaterial = suspiciousMaterial;
+                    
+                    if (CanSeePlayer(alertedPlayer))
+                    {
+                        navAgent.destination = alertedPlayer.transform.position;
+                        suspicion++;
+                        if(suspicion >= framesToCatch)
+                        {
+                            currentState = EnemyStates.Alerted;
+                        }
+                    }
+                    else
+                    {
+                        if((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
+                        {
+                            suspicion = 0;
+                            currentState = EnemyStates.Idle;
+                        }
+                    }
+                    break;
+                case EnemyStates.Alerted:
+                    rend.sharedMaterial = caughtMaterial;
+                    if (!PlayerBase.firstRun)
+                    {
+                        Win();
+                    }
+                    else
+                    {
+                        navAgent.enabled = false;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            rend.sharedMaterial = caughtMaterial;
         }
     }
     public override void Interact(PlayerBase playerBase)
@@ -161,6 +268,11 @@ public class Enemy : InteractionParent
         lineRenderer.positionCount = points.Count;
         lineRenderer.SetPositions(points.ToArray());
     }
+    void Win()
+    {
+        alertedPlayer.canMove = false;
+        GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+    }
     public bool CanSeePlayer(PlayerBase p)
     {
         if (p != null)
@@ -173,51 +285,25 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
-        transform.position = startingPoint.position;
-        transform.rotation = startingPoint.rotation;
+        transform.position = startingPoint;
+        transform.rotation = startingRot;
         alive = true;
         currentPatrolPoint = 0;
+        navAgent.enabled = true;
         navAgent.destination = patrolPoints[currentPatrolPoint].position;
         currentState = EnemyStates.Idle;
+        rend.sharedMaterial = baseMaterial;
         alertedPlayer = null;
         enabled = true;
-        navAgent.enabled = true;
     }
     public IEnumerator Die()
     {
         rb.isKinematic = false;
         navAgent.enabled = false;
-        yield return new WaitForSeconds(interactionTime);
         alive = false;
+        yield return new WaitForSeconds(interactionTime);
         lineRenderer.enabled = false;
         enabled = false;
-    }
-    public IEnumerator BecomeAlerted(PlayerBase player)
-    {
-        if (alive)
-        {
-            rend.sharedMaterial = suspiciousMaterial;
-            alertedPlayer = player;
-            yield return new WaitForSeconds(timeToAlert);
-            if (CanSeePlayer(player))
-            {
-                if (PlayerBase.firstRun)
-                {
-                    rend.sharedMaterial = caughtMaterial;
-                    ghostState = EnemyStates.Alerted;
-                    alerted = true;
-                }
-                else
-                {
-                    currentState = EnemyStates.Alerted;
-                }
-            }
-            else if (!alerted)
-            {
-                currentState = EnemyStates.Idle;
-                rend.sharedMaterial = baseMaterial;
-            }
-        }
     }
     public IEnumerator StopAtPatrolPoint()
     {
@@ -235,5 +321,4 @@ public class Enemy : InteractionParent
             waiting = false;
         }
     }
-
 }

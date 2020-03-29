@@ -7,7 +7,7 @@ public class PlayerBase : MonoBehaviour
 {
     public PlayerBase otherPlayer;
     public static bool firstRun = true;
-    private bool canMove = true;
+    public bool canMove = true;
     private bool canMoveCache = true;
     protected struct InputData
     {
@@ -73,70 +73,57 @@ public class PlayerBase : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             direction.z = 1;
-            Debug.Log("W down");
         }
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             direction.x = -1;
-            Debug.Log("A down");
         }
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             direction.z = -1;
-            Debug.Log("S Down");
         }
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             direction.x = 1;
-            Debug.Log("D down");
         }
         //end movement keys down
 
         //start movement keys up
         if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow))
         {
-            Debug.Log("W up");
             direction.z = 0;
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
-                Debug.Log("S Down");
                 direction.z = -1;
             }
         }
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow))
         {
             direction.x = 0;
-            Debug.Log("A Up");
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             {
                 direction.x = 1;
-                Debug.Log("D down");
             }
         }
         if (Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.DownArrow))
         {
             direction.z = 0;
-            Debug.Log("S Up");
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
                 direction.z = 1;
-                Debug.Log("W Down");
             }
         }
         if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow))
         {
             direction.x = 0;
-            Debug.Log("D Up");
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                Debug.Log("A Down");
                 direction.x = -1;
             }
         }
         //direction.Normalize();
         inputs.direction = direction;
         inputs.direction.Normalize();
-        Debug.Log(direction);
         if (Input.GetButton("Sneak"))
         {
             if (!encumbered)
@@ -184,36 +171,52 @@ public class PlayerBase : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (!isGhost)
+        if (canMove)
         {
-            TimeInput.Add(inputs);
-            time++;
-            Move(inputs);
-        }
-        else
-        {
-            simulatedTime++;
-            if(simulatedTime >= TimeInput.Count)
+            if (!isGhost)
             {
-                GhostSwap();
+                TimeInput.Add(inputs);
+                time++;
+                Move(inputs);
             }
             else
             {
-                Move(TimeInput[simulatedTime]);
+                simulatedTime++;
+                if (simulatedTime >= TimeInput.Count)
+                {
+                    GhostSwap();
+                }
+                else
+                {
+                    Move(TimeInput[simulatedTime]);
+                }
             }
         }
     }
     private void Move(InputData inputData)
     {
-        rb.velocity = inputData.direction;
-        if (inputData.interact && CanInteract())
+        if (canMove)
         {
-            StartCoroutine(DoInteraction());
+            rb.velocity = inputData.direction;
+            if (inputData.interact && CanInteract())
+            {
+                StartCoroutine(DoInteraction());
+            }
         }
     }
     public void GhostSwap()
     {
-        CameraFollowPlayer[] cameras = GameObject.FindObjectsOfType<CameraFollowPlayer>();
+        Debug.Log("swap");
+        Enemy[] interactables = FindObjectsOfType<Enemy>();
+        for (int i = 0; i < interactables.Length; i++)
+        {
+            Debug.Log("number of enemies" + interactables.Length);
+            if (interactables[i] != null)
+            {
+                interactables[i].InteractionReset();
+            }
+        }
+        CameraFollowPlayer[] cameras = FindObjectsOfType<CameraFollowPlayer>();
         foreach (CameraFollowPlayer cam in cameras)
         {
             cam.SwapPlayers();
@@ -252,9 +255,9 @@ public class PlayerBase : MonoBehaviour
         if (Utility.Has<InteractionParent>(other.gameObject))
         {
             interactableTriggers.Remove(other);
-            if(interactableTriggers.Count >= 0)
+            if(interactableTriggers.Count > 0)
             {
-                interactable = interactableTriggers[interactableTriggers.Count > 0 ? interactableTriggers.Count-1 : 0].gameObject.GetComponent<InteractionParent>();
+                interactable = interactableTriggers[interactableTriggers.Count - 1].GetComponent<InteractionParent>();
             }
             else
             {
