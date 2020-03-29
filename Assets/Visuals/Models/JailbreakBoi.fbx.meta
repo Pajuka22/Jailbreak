@@ -1,14 +1,23 @@
 fileFormatVersion: 2
-guid: 209c90a4f60d7dc4eaee67b752b19f90
+guid: 6f97773e323138443b54166f41f9e456
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable:
   - first:
-      74: -623603649343465320
-    second: Walk
-  - first:
-      74: 5522812681064789136
+      74: 4781951162920444690
     second: Run
+  - first:
+      74: -3100369314251171874
+    second: Idle
+  - first:
+      74: -1193861318349305657
+    second: Sneak
+  - first:
+      74: 4406406830517522218
+    second: LockPick
+  - first:
+      74: -1744287435287471575
+    second: Smack
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -38,11 +47,98 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Walk
-      takeName: Scene
+      name: Idle
+      takeName: Armature|ArmatureAction
       internalID: 0
-      firstFrame: 1
-      lastFrame: 43
+      firstFrame: 201
+      lastFrame: 220
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Sneak
+      takeName: Armature|ArmatureAction
+      internalID: 0
+      firstFrame: 78
+      lastFrame: 138
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Run
+      takeName: Armature|ArmatureAction
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: LockPick
+      takeName: Armature|ArmatureAction
+      internalID: 0
+      firstFrame: 161
+      lastFrame: 197
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -67,11 +163,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Run
-      takeName: Scene
+      name: Smack
+      takeName: Armature|ArmatureAction
       internalID: 0
-      firstFrame: 60
-      lastFrame: 119
+      firstFrame: 221
+      lastFrame: 255
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -105,8 +201,8 @@ ModelImporter:
     sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -153,7 +249,7 @@ ModelImporter:
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

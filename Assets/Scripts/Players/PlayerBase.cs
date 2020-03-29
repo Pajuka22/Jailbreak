@@ -51,6 +51,13 @@ public class PlayerBase : MonoBehaviour
     //input stuff
     protected InputData inputs;
     protected Vector3 direction;
+    protected Vector3 facing;
+
+    //animation stuff
+    private enum PlayerStates { Idle, Sneak, Run, LockPick, Smack}
+    private PlayerStates state;
+    public Animator anim;
+
 
     // Start is called before the first frame update
     void Start()
@@ -64,11 +71,20 @@ public class PlayerBase : MonoBehaviour
                 otherPlayer.enabled = false;
             }
         }
+        if(anim == null)
+        {
+            anim = GetComponent<Animator>();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(state);
+        if (anim != null)
+        {
+            anim.SetInteger("state", (int)state);
+        }
         //start movement keys down
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -123,9 +139,11 @@ public class PlayerBase : MonoBehaviour
         }
         //direction.Normalize();
         inputs.direction = direction;
+        transform.rotation = Quaternion.LookRotation(-facing);
         inputs.direction.Normalize();
         if (Input.GetButton("Sneak"))
         {
+
             if (!encumbered)
             {
                 inputs.direction *= sneakSpeed;
@@ -138,7 +156,25 @@ public class PlayerBase : MonoBehaviour
         {
             inputs.direction *= speed;
         }
-
+        if (canMove)
+        {
+            if (inputs.direction == Vector3.zero)
+            {
+                state = PlayerStates.Idle;
+            }
+            else
+            {
+                facing = direction;
+                if (inputs.direction.magnitude == sneakSpeed)
+                {
+                    state = PlayerStates.Sneak;
+                }
+                else
+                {
+                    state = PlayerStates.Run;
+                }
+            }
+        }
         
         //end movement keys up
 
@@ -207,13 +243,16 @@ public class PlayerBase : MonoBehaviour
     public void GhostSwap()
     {
         Debug.Log("swap");
-        Enemy[] interactables = FindObjectsOfType<Enemy>();
-        for (int i = 0; i < interactables.Length; i++)
+        if (firstRun)
         {
-            Debug.Log("number of enemies" + interactables.Length);
-            if (interactables[i] != null)
+            Enemy[] interactables = FindObjectsOfType<Enemy>();
+            for (int i = 0; i < interactables.Length; i++)
             {
-                interactables[i].InteractionReset();
+                Debug.Log("number of enemies" + interactables.Length);
+                if (interactables[i] != null)
+                {
+                    interactables[i].InteractionReset();
+                }
             }
         }
         CameraFollowPlayer[] cameras = FindObjectsOfType<CameraFollowPlayer>();
@@ -271,6 +310,18 @@ public class PlayerBase : MonoBehaviour
     }
     private IEnumerator DoInteraction()
     {
+        state = PlayerStates.Idle;
+        if (interactable.doesItFuckingMatter)
+        {
+            if (canPickLocks)
+            {
+                state = PlayerStates.LockPick;
+            }
+            else
+            {
+                state = PlayerStates.Smack;
+            }
+        }
         canMove = false;
         yield return new WaitForSeconds(secondsForInteractionStart);
         interactable.Interact(this);

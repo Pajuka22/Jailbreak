@@ -39,7 +39,7 @@ public class Enemy : InteractionParent
     public LayerMask blocksSight;
     public PlayerBase alertedPlayer;
     //end player stuff
-    public float timeToAlert = 1.5f;
+    public float alertWinTime = 1.5f;
 
     public enum EnemyStates { Idle, Suspicious, Alerted}
     public EnemyStates ghostState;
@@ -72,77 +72,6 @@ public class Enemy : InteractionParent
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
     }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //InteractionReset();
-        }
-    }
-    // Update is called once per frame
-    /*void Update()
-    {
-        //navAgent.destination = patrolPoints[currentPatrolPoint].position;
-        switch (currentState)
-        {
-            case EnemyStates.Idle:
-                if (Vector3.Distance(transform.position, navAgent.destination) <= destinationAcceptanceRadius && !waiting)
-                {
-                    //Debug.Log("Done" + currentPatrolPoint);
-                    StartCoroutine(StopAtPatrolPoint());
-                }
-                break;
-            case EnemyStates.Suspicious:
-                navAgent.destination = alertedPlayer.transform.position;
-                break;
-            case EnemyStates.Alerted:
-                if (!(PlayerLost || PlayerBase.firstRun))
-                {
-                    Win();
-                    PlayerLost = true;
-                }
-                break;
-        }
-        if (alive)
-        {
-            foreach (PlayerBase p in Players)
-            {
-                if (CanSeePlayer(p))
-                {
-                    if((p.transform.position - transform.position).magnitude < autoAlertRange){
-                        Debug.Log("alerted");
-                        currentState = EnemyStates.Alerted;
-                    }
-                    Debug.Log("i see you");
-                    if ((p.transform.position - transform.position).magnitude > autoAlertRange && !alerted)
-                    {
-                        StartCoroutine(BecomeAlerted(p));
-                    }
-                    else
-                    {
-                        if (PlayerBase.firstRun)
-                        {
-                            rend.sharedMaterial = caughtMaterial;
-                            currentState = EnemyStates.Alerted;
-                        }
-                        else
-                        {
-                            currentState = EnemyStates.Alerted;
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.Log("can't see you");
-                }
-            }
-            
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            InteractionReset();
-        }
-    }*/
     private void FixedUpdate()
     {
         if (PlayerBase.firstRun)
@@ -219,7 +148,8 @@ public class Enemy : InteractionParent
                     rend.sharedMaterial = caughtMaterial;
                     if (!PlayerBase.firstRun)
                     {
-                        Win();
+                        navAgent.speed = 0;
+                        Invoke("Win", alertWinTime);
                     }
                     else
                     {
@@ -231,6 +161,15 @@ public class Enemy : InteractionParent
         else
         {
             rend.sharedMaterial = caughtMaterial;
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (Utility.Has<PlayerBase>(collision.collider.gameObject))
+        {
+            alertedPlayer = collision.collider.gameObject.GetComponent<PlayerBase>();
+            currentState = EnemyStates.Alerted;
+            transform.rotation = Quaternion.LookRotation(alertedPlayer.transform.position, Vector3.up);
         }
     }
     public override void Interact(PlayerBase playerBase)
@@ -270,8 +209,11 @@ public class Enemy : InteractionParent
     }
     void Win()
     {
-        alertedPlayer.canMove = false;
-        GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+        if (alive)
+        {
+            alertedPlayer.canMove = false;
+            GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+        }
     }
     public bool CanSeePlayer(PlayerBase p)
     {
@@ -285,6 +227,7 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
+        rb.isKinematic = true;
         transform.position = startingPoint;
         transform.rotation = startingRot;
         alive = true;

@@ -6,6 +6,7 @@ public class InteractionParent : MonoBehaviour
 {
     public float interactionTime;
     public bool shouldPickLocks;
+    public bool doesItFuckingMatter = true;
     // Start is called before the first frame update
     void Start()
     {
