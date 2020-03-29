@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Physics.IgnoreLayerCollision(cage.gameObject.layer, 8);
+        cage.gameObject.SetActive(false);
         restartMenu.gameObject.SetActive(false);
         pauseMenu.gameObject.SetActive(false);
         gameOverMenu.gameObject.SetActive(false);
@@ -123,6 +125,7 @@ public class GameManager : MonoBehaviour
         {
             cam.SwapPlayers();
         }
+        cage.gameObject.SetActive(true);
         cage.Catch(gotCaught);
         cam.toFollow.canMove = false;
         cam.otherPlayer.canMove = false;

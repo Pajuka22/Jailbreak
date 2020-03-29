@@ -1094,8 +1094,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66bbed7195ed2864b87507461576097c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startInteractionTime: 0
-  endInteractionTime: 0
+  startInteractionTime: 0.75
+  endInteractionTime: 0.25
   shouldPickLocks: 1
   shouldSmack: 1
   doesItFuckingMatter: 1
@@ -2239,7 +2239,22 @@ PrefabInstance:
     - target: {fileID: 4350702953579457605, guid: 5c2670ec73b4bc344a43e852f7e2767c,
         type: 3}
       propertyPath: framesToCatch
-      value: 15
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350702953579457605, guid: 5c2670ec73b4bc344a43e852f7e2767c,
+        type: 3}
+      propertyPath: patrolPointStopTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350702953579457605, guid: 5c2670ec73b4bc344a43e852f7e2767c,
+        type: 3}
+      propertyPath: alertWinTime
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350702953579457605, guid: 5c2670ec73b4bc344a43e852f7e2767c,
+        type: 3}
+      propertyPath: shouldSmack
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4350702953579457607, guid: 5c2670ec73b4bc344a43e852f7e2767c,
         type: 3}

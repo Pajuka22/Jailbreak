@@ -103,6 +103,8 @@ public class Enemy : InteractionParent
                         }
                         else if(currentState != EnemyStates.Alerted)
                         {
+                            waiting = false;
+                            canMove = true;
                             currentState = EnemyStates.Suspicious;
                             navAgent.destination = p.transform.position;
                         }
@@ -264,6 +266,7 @@ public class Enemy : InteractionParent
     {
         if (alive)
         {
+            canMove = false;
             waiting = true;
             yield return new WaitForSeconds(patrolPointStopTime);
             currentPatrolPoint++;
@@ -274,6 +277,7 @@ public class Enemy : InteractionParent
             //Debug.Log(currentPatrolPoint);
             navAgent.destination = patrolPoints[currentPatrolPoint].position;
             waiting = false;
+            canMove = true;
         }
     }
     public override IEnumerator InteractRoutine(PlayerBase p)
