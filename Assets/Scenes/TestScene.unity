@@ -1099,6 +1099,10 @@ MonoBehaviour:
   shouldPickLocks: 1
   shouldSmack: 1
   doesItFuckingMatter: 1
+  pickStartTime: 1.5
+  pickEndTime: 0
+  smackStartTime: 1
+  smackEndTime: 0.25
   WinScene: WIN
 --- !u!135 &1250146678
 SphereCollider:
