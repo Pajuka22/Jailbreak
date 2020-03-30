@@ -45,6 +45,8 @@ public class PlayerBase : MonoBehaviour
     public float encumberedSpeed;
     private InteractionParent interactable;
     private List<InteractionParent> allInteractables = new List<InteractionParent>();
+    bool sneaking;
+    public Transform head;
 
 
     // Start is called before the first frame update
@@ -130,13 +132,13 @@ public class PlayerBase : MonoBehaviour
         //end movement keys up
         direction.Normalize();
         input.velocity = direction;
-        if (Input.GetButton("Sneak"))
+        if (Input.GetButtonDown("Sneak"))
         {
-
-            if (!encumbered)
-            {
-                input.velocity *= sneakSpeed;
-            }
+            sneaking = true;
+        }
+        if (Input.GetButtonUp("Sneak") || encumbered)
+        {
+            sneaking = false;
         }
         else if (encumbered)
         {
@@ -151,14 +153,15 @@ public class PlayerBase : MonoBehaviour
             if (input.velocity.magnitude == 0)
             {
                 input.state = States.Idle;
+                Debug.Log("stopped");
             }
             else 
             {
-                if (input.velocity.magnitude == sneakSpeed)
+                if(sneaking)
                 {
                     input.state = States.Sneak;
                 }
-                else
+                else 
                 {
                     input.state = States.Run;
                 }

@@ -208,7 +208,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -1744287435287471575, guid: 6f97773e323138443b54166f41f9e456,
+  m_Motion: {fileID: -1744287435287471575, guid: 7dd1065ad7ad1a341b71682a42120ae3,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 
@@ -517,7 +517,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -3100369314251171874, guid: 6f97773e323138443b54166f41f9e456,
+  m_Motion: {fileID: 4781951162920444690, guid: 7dd1065ad7ad1a341b71682a42120ae3,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 
@@ -582,7 +582,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Sneak
-  m_Speed: 1
+  m_Speed: 3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 9067057725453730290}
@@ -598,7 +598,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -1193861318349305657, guid: 6f97773e323138443b54166f41f9e456,
+  m_Motion: {fileID: -1193861318349305657, guid: 7dd1065ad7ad1a341b71682a42120ae3,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 
@@ -638,7 +638,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Run
-  m_Speed: 1
+  m_Speed: 4
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -4753833907028895620}
@@ -654,7 +654,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4781951162920444690, guid: 6f97773e323138443b54166f41f9e456,
+  m_Motion: {fileID: 5522812681064789136, guid: 7dd1065ad7ad1a341b71682a42120ae3,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 
@@ -685,7 +685,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4406406830517522218, guid: 6f97773e323138443b54166f41f9e456,
+  m_Motion: {fileID: 4406406830517522218, guid: 7dd1065ad7ad1a341b71682a42120ae3,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 

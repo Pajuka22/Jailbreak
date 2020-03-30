@@ -22,9 +22,16 @@ public class CageBehavior : MonoBehaviour
         
     }
     public void Catch(PlayerBase p)
-    {
+    { 
         transform.position = p.transform.position + Vector3.up * distanceToFall;
         rb.isKinematic = false;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.layer == 0)
+        {
+            FindObjectOfType<GameManager>().LossMenu();
+        }
     }
 }

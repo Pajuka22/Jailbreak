@@ -233,15 +233,16 @@ public class Enemy : InteractionParent
     {
         if (p != null)
         {
-            return (p.transform.position - head.position).magnitude <= sightRange
-                && VectorMath.RadiansToVector(p.transform.position - head.position, head.forward) <= Mathf.Deg2Rad * coneAngle
-                && !Physics.Linecast(head.position, p.transform.position + Vector3.up, blocksSight);
+            return (p.head.position - head.position).magnitude <= sightRange
+                && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * coneAngle
+                && !Physics.Linecast(head.position, p.head.position + Vector3.up, blocksSight);
         }
         return false;
     }
     public override void InteractionReset()
     {
         rb.isKinematic = true;
+        suspicion = 0;
         transform.position = startingPoint;
         transform.rotation = startingRot;
         alive = true;
@@ -252,6 +253,7 @@ public class Enemy : InteractionParent
         rend.sharedMaterial = baseMaterial;
         alertedPlayer = null;
         enabled = true;
+        canMove = true;
     }
     public IEnumerator Die()
     {

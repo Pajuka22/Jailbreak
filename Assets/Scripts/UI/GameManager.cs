@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
                         Quit();
                     }
                 }
-                if (paused)
+                else if (paused)
                 {
                     if(index == 0)
                     {
@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
                         Quit();
                     }
                 }
-                if (restarting)
+                else if (restarting)
                 {
                     if (index == 0)
                     {
@@ -127,6 +127,9 @@ public class GameManager : MonoBehaviour
         }
         cage.gameObject.SetActive(true);
         cage.Catch(gotCaught);
+    }
+    public void LossMenu()
+    {
         cam.toFollow.canMove = false;
         cam.otherPlayer.canMove = false;
         gameOverMenu.gameObject.SetActive(true);
@@ -158,7 +161,9 @@ public class GameManager : MonoBehaviour
     }
     void Restart()
     {
+        isGameOver = false;
         pauseMenu.gameObject.SetActive(false);
+        gameOverMenu.gameObject.SetActive(false);
         restartMenu.gameObject.SetActive(true);
         Debug.Log("Restart Menu");
         restarting = true;
@@ -177,26 +182,38 @@ public class GameManager : MonoBehaviour
     }
     void RestartJustSmacky()
     {
+        cage.gameObject.SetActive(false);
         restarting = false;
         if (!PlayerBase.firstRun)
         {
+
+            InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();
+            foreach(InteractionParent i in interactables)
+            {
+                i.InteractionReset();
+            }
+            cam.toFollow.canMove = true;
+            cam.otherPlayer.canMove = true;
             if (cam.toFollow.canPickLocks)
             {
                 cam.otherPlayer.transform.position = cam.otherPlayer.startPositions[0];
                 cam.toFollow.ghostTime = 0;
                 cam.toFollow.transform.position = cam.toFollow.startPositions[0];
+                Time.timeScale = 1;
             }
             else
             {
                 cam.toFollow.transform.position = cam.toFollow.startPositions[0];
                 cam.otherPlayer.transform.position = cam.otherPlayer.startPositions[0];
                 cam.otherPlayer.ghostTime = 0;
+                Time.timeScale = 1;
             }
         }
         else
         {
             RestartWhole();
         }
+        restartMenu.gameObject.SetActive(false);
     }
     void Quit()
     {
