@@ -34,7 +34,7 @@ public class WinCon : InteractionParent
     public override IEnumerator InteractRoutine(PlayerBase p)
     {
         p.canMove = false;
-        p.transform.rotation = Quaternion.LookRotation((p.transform.position - transform.position) - Vector3.up * (p.transform.position.y - transform.position.y));
+        p.transform.rotation = Quaternion.LookRotation((transform.position - p.transform.position) - Vector3.up * (transform.position.y - p.transform.position.y));
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;

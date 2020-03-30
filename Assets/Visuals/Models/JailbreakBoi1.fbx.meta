@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: 6f97773e323138443b54166f41f9e456
+guid: 7dd1065ad7ad1a341b71682a42120ae3
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable:
   - first:
       74: 4781951162920444690
-    second: Run
-  - first:
-      74: -3100369314251171874
     second: Idle
   - first:
       74: -1193861318349305657
     second: Sneak
+  - first:
+      74: 5522812681064789136
+    second: Run
   - first:
       74: 4406406830517522218
     second: LockPick
@@ -80,7 +80,7 @@ ModelImporter:
       takeName: Armature|ArmatureAction
       internalID: 0
       firstFrame: 78
-      lastFrame: 138
+      lastFrame: 137
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -241,7 +241,7 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     globalScale: 1
-    rootMotionBoneName: 
+    rootMotionBoneName: Root
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1

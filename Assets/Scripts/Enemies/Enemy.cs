@@ -89,7 +89,7 @@ public class Enemy : InteractionParent
                 }
                 foreach (PlayerBase p in Players)
                 {
-                    if (p.enabled && CanSeePlayer(p))
+                    if (p != null && p.enabled && CanSeePlayer(p))
                     {
                         if (nearestPlayer > Vector3.Distance(head.position, p.transform.position))
                         {

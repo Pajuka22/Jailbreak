@@ -162,7 +162,7 @@ public class PlayerBase : MonoBehaviour
                 {
                     input.state = States.Run;
                 }
-                input.rotation = Quaternion.LookRotation(-input.velocity, Vector3.up);
+                input.rotation = Quaternion.LookRotation(input.velocity, Vector3.up);
             }
         }
         else
@@ -214,7 +214,7 @@ public class PlayerBase : MonoBehaviour
         transform.rotation = Input.rotation;
         if (canMove)
         {
-            rb.velocity = Input.velocity;
+            rb.velocity = new Vector3(Input.velocity.x, rb.velocity.y, Input.velocity.z);
             if (Input.interact)
             {
                 //Debug.Log("interact registered");
