@@ -247,6 +247,7 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
+        head.gameObject.SetActive(true);
         held = false;
         headGrab.connectedBody = null;
         currentPatrolPoint = 0;
