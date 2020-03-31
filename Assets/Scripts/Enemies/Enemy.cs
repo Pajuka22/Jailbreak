@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(RagdollController))]
 public class Enemy : InteractionParent
 {
     public static bool PlayerLost;
@@ -12,7 +12,6 @@ public class Enemy : InteractionParent
     public Quaternion startingRot;
     //movement and stuff
     NavMeshAgent navAgent;
-    Rigidbody rb;
     public bool canMove = true;
     public List<Transform> patrolPoints;
     public int currentPatrolPoint;
@@ -50,10 +49,12 @@ public class Enemy : InteractionParent
     public int framesToCatch = 60;
     private Coroutine currentCoroutine;
     int suspicion;
+    private RagdollController ragdoll;
     // Start is called before the first frame update
     
     void Start()
     {
+        ragdoll = GetComponent<RagdollController>();
         if(head == null)
         {
             head = transform;
@@ -66,8 +67,6 @@ public class Enemy : InteractionParent
             rend = GetComponent<Renderer>();
         }
         navAgent = GetComponent<NavMeshAgent>();
-        rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
         ResetSightCone();
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
@@ -179,14 +178,18 @@ public class Enemy : InteractionParent
     }
     public override void Interact(PlayerBase playerBase)
     {
+        Debug.Log("Die");
         if (alive)
         {
-            rb.isKinematic = false;
+            Debug.Log("Was Alive");
             navAgent.enabled = false;
             alive = false;
             lineRenderer.enabled = false;
             enabled = false;
             rend.sharedMaterial = alertedMaterial;
+            GetComponent<CapsuleCollider>().enabled = false;
+            enabled = false;
+            ragdoll.TurnRagdollOn();
         }
     }
     void ResetSightCone()
@@ -241,7 +244,6 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
-        rb.isKinematic = true;
         suspicion = 0;
         transform.position = startingPoint;
         transform.rotation = startingRot;
@@ -254,15 +256,18 @@ public class Enemy : InteractionParent
         alertedPlayer = null;
         enabled = true;
         canMove = true;
+        GetComponent<CapsuleCollider>().enabled = true;
     }
     public IEnumerator Die()
     {
-        rb.isKinematic = false;
+        Debug.Log("Die");
+        GetComponent<CapsuleCollider>().enabled = false;
         navAgent.enabled = false;
         alive = false;
         yield return new WaitForSeconds(startInteractionTime);
         lineRenderer.enabled = false;
         enabled = false;
+        ragdoll.TurnRagdollOn();
     }
     public IEnumerator StopAtPatrolPoint()
     {

@@ -126,7 +126,7 @@ public class PlayerBase : MonoBehaviour
         }
         if (Input.GetButtonDown("Interact"))
         {
-            Debug.Log("Interact");
+            //Debug.Log("Interact");
             input.interact = true;
         }
         //end movement keys up
@@ -153,7 +153,7 @@ public class PlayerBase : MonoBehaviour
             if (input.velocity.magnitude == 0)
             {
                 input.state = States.Idle;
-                Debug.Log("stopped");
+                //Debug.Log("stopped");
             }
             else 
             {
@@ -209,7 +209,7 @@ public class PlayerBase : MonoBehaviour
         {
             Input.state = state;
         }
-        Debug.Log(Input.state);
+        //Debug.Log(Input.state);
         if (anim != null)
         {
             anim.SetInteger("state", (int)Input.state);
@@ -217,7 +217,10 @@ public class PlayerBase : MonoBehaviour
         transform.rotation = Input.rotation;
         if (canMove)
         {
-            rb.velocity = new Vector3(Input.velocity.x, rb.velocity.y, Input.velocity.z);
+            if (!Input.Equals(null))
+            {
+                rb.velocity = new Vector3(Input.velocity.x, rb.velocity.y, Input.velocity.z);
+            }
             if (Input.interact)
             {
                 //Debug.Log("interact registered");
@@ -262,7 +265,7 @@ public class PlayerBase : MonoBehaviour
     }
     public void GhostSwap()
     {
-        Debug.Log("swap");
+        //Debug.Log("swap");
         if (firstRun)
         {
             InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();

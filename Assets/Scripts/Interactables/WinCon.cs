@@ -46,7 +46,7 @@ public class WinCon : InteractionParent
                 endInteractionTime = pickEndTime;
                 p.state = PlayerBase.States.LockPick;
                 p.input.state = PlayerBase.States.LockPick;
-                Debug.Log(("Set your fucking state to lock pick"));
+                //Debug.Log(("Set your fucking state to lock pick"));
             }
             else
             {
