@@ -24,7 +24,6 @@ public class InteractionParent : MonoBehaviour
     }
     public virtual void Interact(PlayerBase playerBase)
     {
-        //Debug.Log("Interact");
         if (playerBase.canPickLocks)
         {
             picked = true;
@@ -52,7 +51,6 @@ public class InteractionParent : MonoBehaviour
                 picked = true;
                 p.state = PlayerBase.States.LockPick;
                 p.input.state = PlayerBase.States.LockPick;
-                //Debug.Log(("Set your fucking state to lock pick"));
             }
             else
             {

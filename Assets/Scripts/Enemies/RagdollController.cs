@@ -31,7 +31,6 @@ public class RagdollController : MonoBehaviour
     }
     public void TurnRagdollOn()
     {
-        Debug.Log("Ragdoll On");
         anim.enabled = false;
         foreach (Rigidbody rb in ragdollColliders)
         {
@@ -40,7 +39,6 @@ public class RagdollController : MonoBehaviour
     }
     public void TurnRagdollOff()
     {
-        Debug.Log("Ragdoll Off");
         anim.enabled = true;
         foreach (Rigidbody rb in ragdollColliders)
         {

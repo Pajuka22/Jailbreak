@@ -45,15 +45,17 @@ public class Enemy : InteractionParent
     public EnemyStates currentState;
     bool alerted;
     float time;
-    bool waiting;
     public int framesToCatch = 60;
     private Coroutine currentCoroutine;
     int suspicion;
     private RagdollController ragdoll;
+    bool held;
+    CharacterJoint headGrab;
     // Start is called before the first frame update
     
     void Start()
     {
+        headGrab = head.GetComponent<CharacterJoint>();
         ragdoll = GetComponent<RagdollController>();
         if(head == null)
         {
@@ -66,7 +68,10 @@ public class Enemy : InteractionParent
         {
             rend = GetComponent<Renderer>();
         }
-        navAgent = GetComponent<NavMeshAgent>();
+        if (navAgent == null)
+        {
+            navAgent = GetComponent<NavMeshAgent>();
+        }
         ResetSightCone();
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
@@ -102,7 +107,6 @@ public class Enemy : InteractionParent
                         }
                         else if(currentState != EnemyStates.Alerted)
                         {
-                            waiting = false;
                             canMove = true;
                             currentState = EnemyStates.Suspicious;
                             navAgent.destination = p.transform.position;
@@ -164,72 +168,25 @@ public class Enemy : InteractionParent
         }
         else
         {
-            rend.sharedMaterial = alertedMaterial;
+            
         }
     }
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (Utility.Has<PlayerBase>(collision.collider.gameObject))
-        {
-            alertedPlayer = collision.collider.gameObject.GetComponent<PlayerBase>();
-            currentState = EnemyStates.Alerted;
-            transform.rotation = Quaternion.LookRotation(alertedPlayer.transform.position, Vector3.up);
-        }
-    }
-    public override void Interact(PlayerBase playerBase)
-    {
-        Debug.Log("Die");
-        if (alive)
-        {
-            Debug.Log("Was Alive");
-            navAgent.enabled = false;
-            alive = false;
-            lineRenderer.enabled = false;
-            enabled = false;
-            rend.sharedMaterial = alertedMaterial;
-            GetComponent<CapsuleCollider>().enabled = false;
-            enabled = false;
-            ragdoll.TurnRagdollOn();
-        }
-    }
-    void ResetSightCone()
-    {
-        float coneRad = coneAngle * Mathf.PI / 180;
-        float baseRadius = sightRange * Mathf.Sin(coneRad);
-        //lineRenderer.positionCount = 26 + 2 * pointsInArc;
-        List<Vector3> points = new List<Vector3>();
-        points.Add(new Vector3(0, 0, sightRange));
-        points.Add(Vector3.zero);
-        //points.Add(sightRange * new Vector3(Mathf.Sin(coneRad), Mathf.Cos(coneRad), 0));
-        for(int i = 5; i >= -5; i--)
-        {
-            points.Add(sightRange * new Vector3(Mathf.Sin(coneRad * i/5), 0, Mathf.Cos(coneRad * i/5)));
-        }
-        points.Add(Vector3.zero);
-        
-        for (int i = 5; i >= -5; i--)
-        {
-            points.Add(sightRange * new Vector3(0, Mathf.Sin(coneRad * i/5), Mathf.Cos(coneRad * i/5)));
-        }
-        for(int i = 0; i <= 20; i++)
-        {
-            points.Add(new Vector3(baseRadius * Mathf.Sin(2 * Mathf.PI * i/20 + Mathf.PI), baseRadius * Mathf.Cos(2 * Mathf.PI * i/20 + Mathf.PI), sightRange * Mathf.Cos(coneRad)));
-        }
-        points.Add(Vector3.zero);
-        //Debug.Log(points.Count);
-        lineRenderer.positionCount = points.Count;
-        lineRenderer.SetPositions(points.ToArray());
-    }
-    void Win()
+    public IEnumerator StopAtPatrolPoint()
     {
         if (alive)
         {
             canMove = false;
-            navAgent.destination = transform.position;
-            navAgent.speed = 0;
-            navAgent.acceleration = 10000000000;
-            alertedPlayer.canMove = false;
-            GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+            yield return new WaitForSeconds(patrolPointStopTime);
+            currentPatrolPoint++;
+            if (currentPatrolPoint >= patrolPoints.Count)
+            {
+                currentPatrolPoint = 0;
+            }
+            if (alive)
+            {
+                navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                canMove = true;
+            }
         }
     }
     public bool CanSeePlayer(PlayerBase p)
@@ -242,8 +199,57 @@ public class Enemy : InteractionParent
         }
         return false;
     }
+    public override void Interact(PlayerBase playerBase)
+    {
+        if (alive)
+        {
+            head.gameObject.SetActive(false);
+            navAgent.enabled = false;
+            alive = false;
+            lineRenderer.enabled = false;
+            enabled = false;
+            rend.sharedMaterial = alertedMaterial;
+            GetComponent<CapsuleCollider>().enabled = false;
+            enabled = false;
+            ragdoll.TurnRagdollOn();
+        }
+        else
+        {
+            if (!held)
+            {
+                head.gameObject.SetActive(true);
+                held = true;
+                rend.sharedMaterial = baseMaterial;
+                headGrab.connectedBody = playerBase.rightHand.GetComponent<Rigidbody>();
+                playerBase.holding = this;
+                Physics.IgnoreLayerCollision(this.gameObject.layer, 8);
+            }
+            else
+            {
+                head.gameObject.SetActive(false);
+                headGrab.connectedBody = null;
+                playerBase.holding = null;
+                Physics.IgnoreLayerCollision(this.gameObject.layer, 8, false);
+                held = false;
+            }
+        }
+    }
+    public override IEnumerator InteractRoutine(PlayerBase p)
+    {
+        canMove = false;
+        if (navAgent.enabled)
+        {
+            navAgent.destination = transform.position;
+            navAgent.speed = 0;
+            navAgent.acceleration = 10000000000;
+        }
+        return base.InteractRoutine(p);
+    }
     public override void InteractionReset()
     {
+        held = false;
+        headGrab.connectedBody = null;
+        currentPatrolPoint = 0;
         suspicion = 0;
         transform.position = startingPoint;
         transform.rotation = startingRot;
@@ -256,44 +262,60 @@ public class Enemy : InteractionParent
         alertedPlayer = null;
         enabled = true;
         canMove = true;
+        ragdoll.TurnRagdollOff();
         GetComponent<CapsuleCollider>().enabled = true;
     }
-    public IEnumerator Die()
+    private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Die");
-        GetComponent<CapsuleCollider>().enabled = false;
-        navAgent.enabled = false;
-        alive = false;
-        yield return new WaitForSeconds(startInteractionTime);
-        lineRenderer.enabled = false;
-        enabled = false;
-        ragdoll.TurnRagdollOn();
+        if (Utility.Has<PlayerBase>(collision.collider.gameObject))
+        {
+            alertedPlayer = collision.collider.gameObject.GetComponent<PlayerBase>();
+            currentState = EnemyStates.Alerted;
+            transform.rotation = Quaternion.LookRotation(alertedPlayer.transform.position, Vector3.up);
+        }
     }
-    public IEnumerator StopAtPatrolPoint()
+    void Win()
     {
         if (alive)
         {
             canMove = false;
-            waiting = true;
-            yield return new WaitForSeconds(patrolPointStopTime);
-            currentPatrolPoint++;
-            if (currentPatrolPoint >= patrolPoints.Count)
-            {
-                currentPatrolPoint = 0;
-            }
-            //Debug.Log(currentPatrolPoint);
-            navAgent.destination = patrolPoints[currentPatrolPoint].position;
-            waiting = false;
-            canMove = true;
+            navAgent.destination = transform.position;
+            navAgent.speed = 0;
+            navAgent.acceleration = 10000000000;
+            alertedPlayer.canMove = false;
+            alertedPlayer.rb.velocity = Vector3.zero;
+            alertedPlayer.otherPlayer.rb.velocity = Vector3.zero;
+            alertedPlayer.otherPlayer.canMove = false;
+            alertedPlayer.anim.SetInteger("state", 0);
+            alertedPlayer.otherPlayer.anim.SetInteger("state", 0);
+            GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
         }
     }
-    public override IEnumerator InteractRoutine(PlayerBase p)
+    void ResetSightCone()
     {
-        canMove = false;
-        navAgent.destination = transform.position;
-        navAgent.speed = 0;
-        navAgent.acceleration = 10000000000;
-        //Debug.Log("StopMoving");
-        return base.InteractRoutine(p);
+        float coneRad = coneAngle * Mathf.PI / 180;
+        float baseRadius = sightRange * Mathf.Sin(coneRad);
+        //lineRenderer.positionCount = 26 + 2 * pointsInArc;
+        List<Vector3> points = new List<Vector3>();
+        points.Add(new Vector3(0, 0, sightRange));
+        points.Add(Vector3.zero);
+        //points.Add(sightRange * new Vector3(Mathf.Sin(coneRad), Mathf.Cos(coneRad), 0));
+        for (int i = 5; i >= -5; i--)
+        {
+            points.Add(sightRange * new Vector3(Mathf.Sin(coneRad * i / 5), 0, Mathf.Cos(coneRad * i / 5)));
+        }
+        points.Add(Vector3.zero);
+
+        for (int i = 5; i >= -5; i--)
+        {
+            points.Add(sightRange * new Vector3(0, Mathf.Sin(coneRad * i / 5), Mathf.Cos(coneRad * i / 5)));
+        }
+        for (int i = 0; i <= 20; i++)
+        {
+            points.Add(new Vector3(baseRadius * Mathf.Sin(2 * Mathf.PI * i / 20 + Mathf.PI), baseRadius * Mathf.Cos(2 * Mathf.PI * i / 20 + Mathf.PI), sightRange * Mathf.Cos(coneRad)));
+        }
+        points.Add(Vector3.zero);
+        lineRenderer.positionCount = points.Count;
+        lineRenderer.SetPositions(points.ToArray());
     }
 }

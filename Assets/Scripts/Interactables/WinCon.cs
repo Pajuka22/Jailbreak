@@ -13,6 +13,8 @@ public class WinCon : InteractionParent
     // Start is called before the first frame update
     void Start()
     {
+        picked = false;
+        smacked = false;
         doesItFuckingMatter = true;
     }
 
@@ -26,7 +28,18 @@ public class WinCon : InteractionParent
     }
     public override void Interact(PlayerBase playerBase)
     {
-        if (playerBase.canPickLocks && PlayerBase.firstRun)
+        if (!PlayerBase.firstRun)
+        {
+            if (playerBase.canPickLocks)
+            {
+                picked = true;
+            }
+            else if(picked)
+            {
+                smacked = true;
+            }
+        }
+        else
         {
             playerBase.GhostSwap();
         }
@@ -60,17 +73,6 @@ public class WinCon : InteractionParent
         yield return new WaitForSeconds(startInteractionTime);
         Interact(p);
         yield return new WaitForSeconds(endInteractionTime);
-        if (!PlayerBase.firstRun)
-        {
-            if (p.canPickLocks)
-            {
-                picked = true;
-            }
-            else if(picked)
-            {
-                smacked = true;
-            }
-        }
         p.canMove = true;
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;
