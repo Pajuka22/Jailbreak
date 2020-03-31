@@ -217,21 +217,25 @@ public class Enemy : InteractionParent
         {
             if (!held)
             {
-                head.gameObject.SetActive(true);
-                held = true;
+                Debug.Log("Pick Up");
+                headGrab.gameObject.SetActive(true);
                 rend.sharedMaterial = baseMaterial;
-                headGrab.connectedBody = playerBase.rightHand.GetComponent<Rigidbody>();
+                headGrab.connectedBody = playerBase.leftHand.GetComponent<Rigidbody>();
+                headGrab.connectedAnchor = Vector3.zero;
                 playerBase.holding = this;
+                playerBase.encumbered = true;
                 Physics.IgnoreLayerCollision(this.gameObject.layer, 8);
             }
             else
             {
-                head.gameObject.SetActive(false);
+                Debug.Log("Drop");
+                playerBase.encumbered = false;
+                headGrab.gameObject.SetActive(false);
                 headGrab.connectedBody = null;
                 playerBase.holding = null;
-                Physics.IgnoreLayerCollision(this.gameObject.layer, 8, false);
-                held = false;
+                Physics.IgnoreLayerCollision(gameObject.layer, 8, false);
             }
+            held = !held;
         }
     }
     public override IEnumerator InteractRoutine(PlayerBase p)

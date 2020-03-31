@@ -46,7 +46,7 @@ public class PlayerBase : MonoBehaviour
     private List<InteractionParent> allInteractables = new List<InteractionParent>();
     bool sneaking;
     public Transform head;
-    public Transform rightHand;
+    public Transform leftHand;
     [System.NonSerialized]
     public InteractionParent holding;
 
@@ -187,7 +187,10 @@ public class PlayerBase : MonoBehaviour
         {
             if (!isGhost)
             {
-                ghostInputs.Add(input);
+                if (firstRun)
+                {
+                    ghostInputs.Add(input);
+                }
                 time++;
                 Move(input);
                 input.state = state;
@@ -228,6 +231,7 @@ public class PlayerBase : MonoBehaviour
             {
                 if (CanInteract())
                 {
+                    Debug.Log(holding == null);
                     if (holding == null)
                     {
                         StartCoroutine(interactable.InteractRoutine(this));
