@@ -8,6 +8,7 @@ public class InteractionParent : MonoBehaviour
     public float endInteractionTime;
     public bool shouldPickLocks;
     public bool shouldSmack;
+    public bool emptyHands;
     public bool doesItFuckingMatter = true;
     protected bool picked;
     protected bool smacked;
@@ -44,6 +45,11 @@ public class InteractionParent : MonoBehaviour
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;
+        if (p.holding != null && emptyHands)
+        {
+            Debug.Log("Drop the fucking body");
+            p.holding.Drop(p);
+        }
         if (doesItFuckingMatter)
         {
             if (p.canPickLocks)
@@ -67,5 +73,13 @@ public class InteractionParent : MonoBehaviour
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;
         p.anim.SetInteger("state", (int)p.input.state);
+    }
+    public virtual void Drop(PlayerBase p)
+    {
+
+    }
+    public virtual void PickUp(PlayerBase p)
+    {
+
     }
 }

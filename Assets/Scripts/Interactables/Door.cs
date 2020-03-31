@@ -65,6 +65,7 @@ public class Door : InteractionParent
     }
     public override void Interact(PlayerBase playerBase)
     {
+        Debug.Log("Drop the fucking Body");
         base.Interact(playerBase);
         switch (currentState)
         {

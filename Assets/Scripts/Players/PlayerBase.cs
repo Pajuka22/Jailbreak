@@ -231,14 +231,13 @@ public class PlayerBase : MonoBehaviour
             {
                 if (CanInteract())
                 {
-                    Debug.Log(holding == null);
-                    if (holding == null)
+                    if(interactable == null && holding != null)
                     {
-                        StartCoroutine(interactable.InteractRoutine(this));
+                        holding.Drop(this);
                     }
                     else
                     {
-                        holding.Interact(this);
+                        StartCoroutine(interactable.InteractRoutine(this));
                     }
                 }
             }
@@ -250,7 +249,7 @@ public class PlayerBase : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (!encumbered && Utility.Has<InteractionParent>(other.transform.root.gameObject))
+        if (Utility.Has<InteractionParent>(other.transform.root.gameObject))
         {
             interactable = other.transform.root.gameObject.GetComponent<InteractionParent>();
             allInteractables.Add(interactable);

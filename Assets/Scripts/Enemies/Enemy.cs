@@ -195,7 +195,7 @@ public class Enemy : InteractionParent
         {
             return (p.head.position - head.position).magnitude <= sightRange
                 && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * coneAngle
-                && !Physics.Linecast(head.position, p.head.position + Vector3.up, blocksSight);
+                && !Physics.Linecast(head.position, p.head.position, blocksSight);
         }
         return false;
     }
@@ -217,26 +217,36 @@ public class Enemy : InteractionParent
         {
             if (!held)
             {
-                Debug.Log("Pick Up");
-                headGrab.gameObject.SetActive(true);
-                rend.sharedMaterial = baseMaterial;
-                headGrab.connectedBody = playerBase.leftHand.GetComponent<Rigidbody>();
-                headGrab.connectedAnchor = Vector3.zero;
-                playerBase.holding = this;
-                playerBase.encumbered = true;
-                Physics.IgnoreLayerCollision(this.gameObject.layer, 8);
+                PickUp(playerBase);
             }
+            /*
             else
             {
-                Debug.Log("Drop");
-                playerBase.encumbered = false;
-                headGrab.gameObject.SetActive(false);
-                headGrab.connectedBody = null;
-                playerBase.holding = null;
-                Physics.IgnoreLayerCollision(gameObject.layer, 8, false);
+                Drop(playerBase);
             }
             held = !held;
+            */
         }
+    }
+    public override void PickUp(PlayerBase p)
+    {
+        Debug.Log("Pick Up");
+        headGrab.gameObject.SetActive(true);
+        rend.sharedMaterial = baseMaterial;
+        headGrab.connectedBody = p.leftHand.GetComponent<Rigidbody>();
+        headGrab.connectedAnchor = Vector3.zero;
+        p.holding = this;
+        p.encumbered = true;
+        Physics.IgnoreLayerCollision(this.gameObject.layer, 8);
+    }
+    public override void Drop(PlayerBase p)
+    {
+        Debug.Log("Drop");
+        p.encumbered = false;
+        headGrab.gameObject.SetActive(false);
+        headGrab.connectedBody = null;
+        p.holding = null;
+        Physics.IgnoreLayerCollision(gameObject.layer, 8, false);
     }
     public override IEnumerator InteractRoutine(PlayerBase p)
     {
