@@ -120,7 +120,6 @@ public class GameManager : MonoBehaviour
     public void GameOver(PlayerBase gotCaught)
     {
         buttons = 1;
-        Debug.Log("YOU LOSE");
         if(cam.toFollow != gotCaught)
         {
             cam.SwapPlayers();
@@ -165,7 +164,6 @@ public class GameManager : MonoBehaviour
         pauseMenu.gameObject.SetActive(false);
         gameOverMenu.gameObject.SetActive(false);
         restartMenu.gameObject.SetActive(true);
-        Debug.Log("Restart Menu");
         restarting = true;
         paused = false;
         buttons = 2;

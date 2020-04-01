@@ -19,7 +19,6 @@ public class MenuManager : MonoBehaviour
         {
             buttons[i].selected = false;
         }
-        Debug.Log(GameManager.index);
         buttons[GameManager.index].selected = true;
     }
 }

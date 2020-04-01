@@ -47,7 +47,7 @@ public class Enemy : InteractionParent
     public float alertWinTime = 1.5f;
     
 
-    public enum EnemyStates { Idle, Suspicious, Alerted}
+    public enum EnemyStates { Idle, Suspicious, Alerted, Look}
     public EnemyStates ghostState;
     public EnemyStates currentState;
     bool alerted;
@@ -58,8 +58,12 @@ public class Enemy : InteractionParent
     private RagdollController ragdoll;
     bool held;
     CharacterJoint headGrab;
+    public static List<Enemy> allEnemies = new List<Enemy>();
+    public static List<Enemy> deadEnemies = new List<Enemy>();
+    public List<Enemy> myDeadEnemies = new List<Enemy>();
+    private Enemy deadEnemySpotted;
     // Start is called before the first frame update
-    
+
     protected override void Start()
     {
         headGrab = head.GetComponent<CharacterJoint>();
@@ -86,6 +90,8 @@ public class Enemy : InteractionParent
     }
     private void FixedUpdate()
     {
+        Debug.Log(alertedPlayer);
+        Debug.Log(deadEnemySpotted);
         float nearestPlayer = sightRange + 1;
         if (alive)
         {
@@ -121,6 +127,23 @@ public class Enemy : InteractionParent
                         }
                     }
                 }
+                if(alertedPlayer == null)
+                {
+                    float nearestDeadEnemy = sightRange;
+                    foreach (Enemy e in deadEnemies)
+                    {
+                        if (!myDeadEnemies.Contains(e) && CanSeePosition(e.head.position))
+                        {
+                            if(Vector3.Distance(head.position, e.head.position) < nearestDeadEnemy)
+                            {
+                                myDeadEnemies.Add(e);
+                                deadEnemySpotted = e;
+                                currentState = EnemyStates.Suspicious;
+                                navAgent.destination = e.head.position;
+                            }
+                        }
+                    }
+                }
                 switch (currentState)
                 {
                     case EnemyStates.Idle:
@@ -141,21 +164,35 @@ public class Enemy : InteractionParent
                             currentCoroutine = null;
                         }
                         rend.sharedMaterial = suspiciousMaterial;
-
-                        if (CanSeePlayer(alertedPlayer))
+                        if (alertedPlayer != null)
                         {
-                            navAgent.destination = alertedPlayer.transform.position;
-                            if (suspicion >= framesToCatch)
+                            if (CanSeePlayer(alertedPlayer))
                             {
-                                currentState = EnemyStates.Alerted;
+                                navAgent.destination = alertedPlayer.transform.position;
+                                if (suspicion >= framesToCatch)
+                                {
+                                    currentState = EnemyStates.Alerted;
+                                }
+                            }
+                            else
+                            {
+                                if ((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
+                                {
+                                    suspicion = 0;
+                                    //currentState = EnemyStates.Look;
+                                    StartCoroutine(LookAround());
+                                }
                             }
                         }
                         else
                         {
-                            if ((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
+                            if(deadEnemySpotted != null)
                             {
-                                suspicion = 0;
-                                currentState = EnemyStates.Idle;
+                                if ((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
+                                {
+                                    suspicion = 0;
+                                    StartCoroutine(LookAround());
+                                }
                             }
                         }
                         break;
@@ -171,12 +208,14 @@ public class Enemy : InteractionParent
                             navAgent.enabled = false;
                         }
                         break;
+                    default:
+                        Debug.Log(currentState);
+                        break;
                 }
             }
         }
         else
         {
-            
         }
     }
     public IEnumerator StopAtPatrolPoint()
@@ -197,6 +236,17 @@ public class Enemy : InteractionParent
             }
         }
     }
+    public IEnumerator LookAround()
+    {
+        canMove = false;
+        currentState = EnemyStates.Look;
+        yield return new WaitForSeconds(1.625f);
+        suspicion = 0;
+        canMove = true;
+        deadEnemySpotted = null;
+        alertedPlayer = null;
+        currentState = EnemyStates.Idle;
+    }
     public bool CanSeePlayer(PlayerBase p)
     {
         if (p != null)
@@ -207,10 +257,17 @@ public class Enemy : InteractionParent
         }
         return false;
     }
+    public bool CanSeePosition(Vector3 pos)
+    {
+        return (pos - head.position).magnitude <= sightRange &&
+            VectorMath.RadiansToVector(pos - head.position, head.forward) <= Mathf.Deg2Rad * sightAngle &&
+            !Physics.Linecast(head.position, pos, blocksSight);
+    }
     public override void Interact(PlayerBase playerBase)
     {
         if (alive)
         {
+            deadEnemies.Add(this);
             head.gameObject.SetActive(false);
             navAgent.enabled = false;
             alive = false;
@@ -238,7 +295,6 @@ public class Enemy : InteractionParent
     }
     public override void PickUp(PlayerBase p)
     {
-        Debug.Log("Pick Up");
         headGrab.gameObject.SetActive(true);
         rend.sharedMaterial = baseMaterial;
         headGrab.connectedBody = p.leftHand.GetComponent<Rigidbody>();
@@ -249,7 +305,6 @@ public class Enemy : InteractionParent
     }
     public override void Drop(PlayerBase p)
     {
-        Debug.Log("Drop");
         p.encumbered = false;
         headGrab.gameObject.SetActive(false);
         headGrab.connectedBody = null;
@@ -269,6 +324,7 @@ public class Enemy : InteractionParent
         {
             startInteractionTime = startSmackTime;
             endInteractionTime = endSmackTime;
+            deadEnemies.Add(this);
         }
         else
         {
@@ -320,6 +376,7 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
+        deadEnemies.Clear();
         head.gameObject.SetActive(true);
         held = false;
         headGrab.connectedBody = null;
