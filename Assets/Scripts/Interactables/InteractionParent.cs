@@ -48,7 +48,6 @@ public class InteractionParent : MonoBehaviour
         p.input.state = PlayerBase.States.Idle;
         if (p.holding != null && emptyHands)
         {
-            Debug.Log("Drop the fucking body");
             p.holding.Drop(p);
         }
         if (doesItFuckingMatter)

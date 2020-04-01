@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEditor;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(RagdollController))]
 public class Enemy : InteractionParent
 {
+    public float startSmackTime;
+    public float endSmackTime;
+    public float startPickUpTime;
+    public float endPickUpTime;
     public static bool PlayerLost;
     public Vector3 startingPoint;
     public Quaternion startingRot;
@@ -28,17 +33,19 @@ public class Enemy : InteractionParent
     public int pointsInArc;
     public Transform head;
     [Range(0, 90)]
-    public float coneAngle;
+    public float sightAngle;
     public float sightRange;
     public float autoAlertRange;
     //end line of sight
     //player stuff
     public PlayerBase[] Players = new PlayerBase[2];
+    [System.NonSerialized]
     public bool alive = true;
     public LayerMask blocksSight;
     public PlayerBase alertedPlayer;
     //end player stuff
     public float alertWinTime = 1.5f;
+    
 
     public enum EnemyStates { Idle, Suspicious, Alerted}
     public EnemyStates ghostState;
@@ -195,7 +202,7 @@ public class Enemy : InteractionParent
         if (p != null)
         {
             return (p.head.position - head.position).magnitude <= sightRange
-                && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * coneAngle
+                && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * sightAngle
                 && !Physics.Linecast(head.position, p.head.position, blocksSight);
         }
         return false;
@@ -258,7 +265,58 @@ public class Enemy : InteractionParent
             navAgent.speed = 0;
             navAgent.acceleration = 10000000000;
         }
-        return base.InteractRoutine(p);
+        if (alive)
+        {
+            startInteractionTime = startSmackTime;
+            endInteractionTime = endSmackTime;
+        }
+        else
+        {
+            startInteractionTime = startPickUpTime;
+            endInteractionTime = endPickUpTime;
+        }
+        //start base stuff but slightly edited
+        p.canMove = false;
+        p.transform.rotation = Quaternion.LookRotation((head.position - p.transform.position) - Vector3.up * (head.position.y - p.transform.position.y));
+        p.input.rotation = p.transform.rotation;
+        p.state = PlayerBase.States.Idle;
+        p.input.state = PlayerBase.States.Idle;
+        if (p.holding != null && emptyHands)
+        {
+            Debug.Log("Drop the fucking body");
+            p.holding.Drop(p);
+        }
+        if (doesItFuckingMatter)
+        {
+            if (p.canPickLocks)
+            {
+                picked = true;
+                p.state = PlayerBase.States.LockPick;
+                p.input.state = PlayerBase.States.LockPick;
+            }
+            else
+            {
+                if (alive)
+                {
+                    p.state = PlayerBase.States.Smack;
+                    p.input.state = PlayerBase.States.Smack;
+                    smacked = true;
+                }
+                else
+                {
+                    p.state = PlayerBase.States.PickUp;
+                    p.input.state = PlayerBase.States.PickUp;
+                }
+            }
+        }
+        p.anim.SetInteger("state", (int)p.input.state);
+        yield return new WaitForSeconds(startInteractionTime);
+        Interact(p);
+        yield return new WaitForSeconds(endInteractionTime);
+        p.canMove = true;
+        p.state = PlayerBase.States.Idle;
+        p.input.state = PlayerBase.States.Idle;
+        p.anim.SetInteger("state", (int)p.input.state);
     }
     public override void InteractionReset()
     {
@@ -310,7 +368,7 @@ public class Enemy : InteractionParent
     }
     void ResetSightCone()
     {
-        float coneRad = coneAngle * Mathf.PI / 180;
+        float coneRad = sightAngle * Mathf.PI / 180;
         float baseRadius = sightRange * Mathf.Sin(coneRad);
         //lineRenderer.positionCount = 26 + 2 * pointsInArc;
         List<Vector3> points = new List<Vector3>();

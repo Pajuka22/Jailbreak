@@ -11,7 +11,7 @@ public class WinCon : InteractionParent
     public float smackEndTime;
     public string WinScene;
     // Start is called before the first frame update
-    protected override void Start()
+    protected override  void Start()
     {
         picked = false;
         smacked = false;
@@ -52,6 +52,10 @@ public class WinCon : InteractionParent
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;
+        if(p.holding != null && emptyHands)
+        {
+            p.holding.Drop(p);
+        }
         if (doesItFuckingMatter)
         {
             if (p.canPickLocks)
