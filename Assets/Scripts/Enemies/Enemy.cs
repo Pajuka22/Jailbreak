@@ -90,8 +90,6 @@ public class Enemy : InteractionParent
     }
     private void FixedUpdate()
     {
-        Debug.Log(alertedPlayer);
-        Debug.Log(deadEnemySpotted);
         float nearestPlayer = sightRange + 1;
         if (alive)
         {

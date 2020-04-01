@@ -74,7 +74,6 @@ public class PlayerBase : MonoBehaviour
     void Update()
     {
         state = States.Idle;
-        input.interact = false;
         //start movement keys down
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -130,6 +129,7 @@ public class PlayerBase : MonoBehaviour
         if (Input.GetButtonDown("Interact"))
         {
             input.interact = true;
+            Debug.Log("InteractPressed");
         }
         //end movement keys up
         direction.Normalize();
@@ -246,10 +246,14 @@ public class PlayerBase : MonoBehaviour
             {
                 rb.velocity = new Vector3(Input.velocity.x, rb.velocity.y, Input.velocity.z);
             }
+            Debug.ClearDeveloperConsole();
             if (Input.interact)
             {
+                Debug.Log("Tried to Interact");
+                input.interact = false;
                 if (CanInteract())
                 {
+                    Debug.Log("Was able to");
                     if(interactable == null && holding != null)
                     {
                         holding.Drop(this);
@@ -258,6 +262,10 @@ public class PlayerBase : MonoBehaviour
                     {
                         StartCoroutine(interactable.InteractRoutine(this));
                     }
+                }
+                else
+                {
+                    Debug.Log("Could Not");
                 }
             }
         }

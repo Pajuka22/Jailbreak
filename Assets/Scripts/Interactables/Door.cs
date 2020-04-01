@@ -65,7 +65,6 @@ public class Door : InteractionParent
     }
     public override void Interact(PlayerBase playerBase)
     {
-        Debug.Log("tried to open door");
         base.Interact(playerBase);
         switch (currentState)
         {

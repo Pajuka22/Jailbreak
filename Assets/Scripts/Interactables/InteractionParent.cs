@@ -42,7 +42,7 @@ public class InteractionParent : MonoBehaviour
     }
     public virtual IEnumerator InteractRoutine(PlayerBase p)
     {
-        p.canMove = false;
+        p.canMove = startInteractionTime + endInteractionTime == 0;
         p.transform.rotation = Quaternion.LookRotation((transform.position - p.transform.position) - Vector3.up * (transform.position.y - p.transform.position.y));
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
