@@ -181,10 +181,7 @@ public class PlayerBase : MonoBehaviour
         {
             input.state = state;
         }
-    }
-    private void FixedUpdate()
-    {
-        if(interactable != null)
+        if (interactable != null && !isGhost)
         {
             interactionIndicator.SetActive(true);
             if (interactable.indicatorLocation != null)
@@ -202,6 +199,9 @@ public class PlayerBase : MonoBehaviour
         {
             interactionIndicator.SetActive(false);
         }
+    }
+    private void FixedUpdate()
+    {
         if (canMove)
         {
             if (!isGhost)
