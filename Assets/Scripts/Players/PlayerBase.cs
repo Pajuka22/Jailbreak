@@ -49,6 +49,7 @@ public class PlayerBase : MonoBehaviour
     public Transform leftHand;
     [System.NonSerialized]
     public InteractionParent holding;
+    public GameObject interactionIndicator;
 
     // Start is called before the first frame update
     void Start()
@@ -183,6 +184,24 @@ public class PlayerBase : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if(interactable != null)
+        {
+            interactionIndicator.SetActive(true);
+            if (interactable.indicatorLocation != null)
+            {
+                interactionIndicator.transform.position = interactable.indicatorLocation.position + Vector3.up * 0.5f;
+            }
+            else
+            {
+                interactionIndicator.transform.position = interactable.transform.position + Vector3.up;
+            }
+            interactionIndicator.transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - interactionIndicator.transform.position -
+                Vector3.up * VectorMath.DistanceInDirection(Camera.main.transform.position - interactionIndicator.transform.position, Vector3.up), Vector3.up);
+        }
+        else
+        {
+            interactionIndicator.SetActive(false);
+        }
         if (canMove)
         {
             if (!isGhost)
