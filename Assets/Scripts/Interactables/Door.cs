@@ -17,7 +17,7 @@ public class Door : InteractionParent
     public float endUnlockTime;
     public float startOpenTime;
     public float endOpenTime;
-    void Start()
+    protected override void Start()
     {
         doesItFuckingMatter = true;
         shouldPickLocks = true;
@@ -31,7 +31,7 @@ public class Door : InteractionParent
         {
             rend.sharedMaterial = unlockedMat;
         }
-
+        base.Start();
     }
     // Update is called once per framed
     void Update()
@@ -65,7 +65,7 @@ public class Door : InteractionParent
     }
     public override void Interact(PlayerBase playerBase)
     {
-        Debug.Log("Drop the fucking Body");
+        Debug.Log("tried to open door");
         base.Interact(playerBase);
         switch (currentState)
         {

@@ -12,10 +12,11 @@ public class InteractionParent : MonoBehaviour
     public bool doesItFuckingMatter = true;
     protected bool picked;
     protected bool smacked;
+    public Collider interactionCollider;
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
-        
+        interactionCollider.isTrigger = true;
     }
 
     // Update is called once per frame

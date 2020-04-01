@@ -11,11 +11,12 @@ public class WinCon : InteractionParent
     public float smackEndTime;
     public string WinScene;
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         picked = false;
         smacked = false;
         doesItFuckingMatter = true;
+        base.Start();
     }
 
     // Update is called once per frame

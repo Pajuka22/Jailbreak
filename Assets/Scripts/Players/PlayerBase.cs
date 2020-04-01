@@ -249,7 +249,8 @@ public class PlayerBase : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (Utility.Has<InteractionParent>(other.transform.root.gameObject))
+        if (Utility.Has<InteractionParent>(other.transform.root.gameObject) && 
+            other == other.transform.root.gameObject.GetComponent<InteractionParent>().interactionCollider)
         {
             interactable = other.transform.root.gameObject.GetComponent<InteractionParent>();
             allInteractables.Add(interactable);
@@ -257,7 +258,8 @@ public class PlayerBase : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (Utility.Has<InteractionParent>(other.transform.root.gameObject))
+        if (Utility.Has<InteractionParent>(other.transform.root.gameObject)&&
+            other == other.transform.root.gameObject.GetComponent<InteractionParent>().interactionCollider)
         {
             allInteractables.Remove(other.transform.root.gameObject.GetComponent<InteractionParent>());
             if (allInteractables.Count > 0)

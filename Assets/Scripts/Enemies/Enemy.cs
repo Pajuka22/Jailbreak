@@ -53,7 +53,7 @@ public class Enemy : InteractionParent
     CharacterJoint headGrab;
     // Start is called before the first frame update
     
-    void Start()
+    protected override void Start()
     {
         headGrab = head.GetComponent<CharacterJoint>();
         ragdoll = GetComponent<RagdollController>();
@@ -75,6 +75,7 @@ public class Enemy : InteractionParent
         ResetSightCone();
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
+        base.Start();
     }
     private void FixedUpdate()
     {
@@ -278,6 +279,7 @@ public class Enemy : InteractionParent
         enabled = true;
         canMove = true;
         ragdoll.TurnRagdollOff();
+        ResetSightCone();
         GetComponent<CapsuleCollider>().enabled = true;
     }
     private void OnCollisionEnter(Collision collision)
@@ -332,5 +334,6 @@ public class Enemy : InteractionParent
         points.Add(Vector3.zero);
         lineRenderer.positionCount = points.Count;
         lineRenderer.SetPositions(points.ToArray());
+        lineRenderer.enabled = true;
     }
 }
