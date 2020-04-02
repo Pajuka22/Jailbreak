@@ -191,8 +191,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: 0
   canSelect: 0
-  sDeselected: {fileID: 2100000, guid: 2a1ece9f2fd710d4b9c3c9b0f9428ad3, type: 2}
-  sSelected: {fileID: 2100000, guid: d53e9dfaa3ce42745bb7019194553605, type: 2}
+  sDeselected: {fileID: 2100000, guid: 447cb6e0d9cef34419df6ca48fb01811, type: 2}
+  sSelected: {fileID: 2100000, guid: 7030d24d1e4922b45b34d2542b919545, type: 2}
   cantSelect: {fileID: 0}
 --- !u!1 &2432241036566146382
 GameObject:
@@ -583,8 +583,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: 0
   canSelect: 0
-  sDeselected: {fileID: 2100000, guid: 4a4f5225705167b4daffa291d97a32f2, type: 2}
-  sSelected: {fileID: 2100000, guid: da7af58d2ad848f4a87efebf286c0e31, type: 2}
+  sDeselected: {fileID: 2100000, guid: 2a1ece9f2fd710d4b9c3c9b0f9428ad3, type: 2}
+  sSelected: {fileID: 2100000, guid: d53e9dfaa3ce42745bb7019194553605, type: 2}
   cantSelect: {fileID: 0}
 --- !u!1 &6803330692725064508
 GameObject:

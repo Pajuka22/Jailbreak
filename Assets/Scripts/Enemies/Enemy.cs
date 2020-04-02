@@ -425,6 +425,7 @@ public class Enemy : InteractionParent
             alertedPlayer.anim.SetInteger("state", 0);
             alertedPlayer.otherPlayer.anim.SetInteger("state", 0);
             FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+            winning = true;
         }
     }
     void ResetSightCone()
