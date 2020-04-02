@@ -266,16 +266,7 @@ public class Enemy : InteractionParent
     {
         if (alive)
         {
-            deadEnemies.Add(this);
-            head.gameObject.SetActive(false);
-            navAgent.enabled = false;
-            alive = false;
-            lineRenderer.enabled = false;
-            enabled = false;
-            rend.sharedMaterial = alertedMaterial;
-            GetComponent<CapsuleCollider>().enabled = false;
-            enabled = false;
-            ragdoll.TurnRagdollOn();
+            Die();
         }
         else
         {
@@ -291,6 +282,19 @@ public class Enemy : InteractionParent
             held = !held;
             */
         }
+    }
+    public void Die()
+    {
+        deadEnemies.Add(this);
+        head.gameObject.SetActive(false);
+        navAgent.enabled = false;
+        alive = false;
+        lineRenderer.enabled = false;
+        enabled = false;
+        rend.sharedMaterial = alertedMaterial;
+        GetComponent<CapsuleCollider>().enabled = false;
+        enabled = false;
+        ragdoll.TurnRagdollOn();
     }
     public override void PickUp(PlayerBase p)
     {
@@ -331,6 +335,8 @@ public class Enemy : InteractionParent
         }
         //start base stuff but slightly edited
         p.canMove = false;
+        p.input.velocity = Vector3.zero;
+        p.rb.velocity = Vector3.zero;
         p.transform.rotation = Quaternion.LookRotation((head.position - p.transform.position) - Vector3.up * (head.position.y - p.transform.position.y));
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
