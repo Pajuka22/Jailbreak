@@ -206,8 +206,12 @@ public class PlayerBase : MonoBehaviour
         {
             if (!isGhost)
             {
-                if (firstRun)
+                if (!canMove)
                 {
+                    input.velocity = Vector3.zero;
+                }
+                if (firstRun)
+                {   
                     ghostInputs.Add(input);
                 }
                 time++;

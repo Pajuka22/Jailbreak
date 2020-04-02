@@ -62,6 +62,7 @@ public class Enemy : InteractionParent
     public static List<Enemy> deadEnemies = new List<Enemy>();
     public List<Enemy> myDeadEnemies = new List<Enemy>();
     private Enemy deadEnemySpotted;
+    public static bool winning;
     // Start is called before the first frame update
 
     protected override void Start()
@@ -405,9 +406,10 @@ public class Enemy : InteractionParent
     }
     void Win()
     {
-        if (alive)
+        if (alive && !winning)
         {
             canMove = false;
+            winning = true;
             navAgent.destination = transform.position;
             navAgent.speed = 0;
             navAgent.acceleration = 10000000000;
@@ -417,7 +419,8 @@ public class Enemy : InteractionParent
             alertedPlayer.otherPlayer.canMove = false;
             alertedPlayer.anim.SetInteger("state", 0);
             alertedPlayer.otherPlayer.anim.SetInteger("state", 0);
-            GameObject.FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+            FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+            
         }
     }
     void ResetSightCone()
