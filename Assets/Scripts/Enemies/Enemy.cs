@@ -294,7 +294,6 @@ public class Enemy : InteractionParent
     public override void PickUp(PlayerBase p)
     {
         headGrab.gameObject.SetActive(true);
-        rend.sharedMaterial = baseMaterial;
         headGrab.connectedBody = p.leftHand.GetComponent<Rigidbody>();
         headGrab.connectedAnchor = Vector3.zero;
         p.holding = this;
