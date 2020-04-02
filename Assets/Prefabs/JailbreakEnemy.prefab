@@ -874,7 +874,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6478536213147159724, guid: c2cfd3000c8cca644a32545b57326e33, type: 3}
+  - {fileID: 2100000, guid: 6c5c116cc03212f4c86add2a19ffbc55, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1989,6 +1989,7 @@ MonoBehaviour:
   emptyHands: 0
   doesItFuckingMatter: 1
   interactionCollider: {fileID: 1047855745081729091}
+  indicatorLocation: {fileID: 0}
   startSmackTime: 0
   endSmackTime: 0
   startPickUpTime: 0.45
