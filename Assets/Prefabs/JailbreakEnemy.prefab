@@ -356,8 +356,8 @@ CharacterJoint:
   m_ConnectedBody: {fileID: 1047855746101166336}
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000046408292, y: -0.0000004172325, z: -0.00000017882972}
+  m_AutoConfigureConnectedAnchor: 0
+  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 1, z: 0}
   m_TwistLimitSpring:
@@ -897,7 +897,7 @@ SkinnedMeshRenderer:
   m_SortingOrder: 0
   serializedVersion: 2
   m_Quality: 0
-  m_UpdateWhenOffscreen: 0
+  m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
   m_Mesh: {fileID: -5495902117074765545, guid: c2cfd3000c8cca644a32545b57326e33, type: 3}
   m_Bones:
@@ -1989,7 +1989,7 @@ MonoBehaviour:
   emptyHands: 0
   doesItFuckingMatter: 1
   interactionCollider: {fileID: 1047855745081729091}
-  indicatorLocation: {fileID: 0}
+  indicatorLocation: {fileID: 1818295442013381209}
   startSmackTime: 0
   endSmackTime: 0
   startPickUpTime: 0.45

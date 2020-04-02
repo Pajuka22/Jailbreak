@@ -71,9 +71,13 @@ public class GameManager : MonoBehaviour
             {
                 if (isGameOver)
                 {
-                    if(index == 0)
+                    if (index == 0)
                     {
-                        Restart();
+                        RestartJustSmacky();
+                    }
+                    else if (index == 1)
+                    {
+                        RestartWhole();
                     }
                     else
                     {
@@ -119,7 +123,7 @@ public class GameManager : MonoBehaviour
     }
     public void GameOver(PlayerBase gotCaught)
     {
-        buttons = 1;
+        buttons = 2;
         if(cam.toFollow != gotCaught)
         {
             cam.SwapPlayers();
@@ -177,6 +181,7 @@ public class GameManager : MonoBehaviour
         paused = false;
         Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SetAllMenus(false);
     }
     void RestartJustSmacky()
     {
@@ -211,7 +216,13 @@ public class GameManager : MonoBehaviour
         {
             RestartWhole();
         }
-        restartMenu.gameObject.SetActive(false);
+        SetAllMenus(false);
+    }
+    void SetAllMenus(bool on)
+    {
+        gameOverMenu.gameObject.SetActive(on);
+        pauseMenu.gameObject.SetActive(on);
+        restartMenu.gameObject.SetActive(on);
     }
     void Quit()
     {

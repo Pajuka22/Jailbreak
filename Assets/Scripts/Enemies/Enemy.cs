@@ -415,7 +415,6 @@ public class Enemy : InteractionParent
         if (alive && !winning)
         {
             canMove = false;
-            winning = true;
             navAgent.destination = transform.position;
             navAgent.speed = 0;
             navAgent.acceleration = 10000000000;
@@ -426,7 +425,6 @@ public class Enemy : InteractionParent
             alertedPlayer.anim.SetInteger("state", 0);
             alertedPlayer.otherPlayer.anim.SetInteger("state", 0);
             FindObjectOfType<GameManager>().GameOver(alertedPlayer);
-            
         }
     }
     void ResetSightCone()
