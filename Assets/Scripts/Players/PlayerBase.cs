@@ -253,11 +253,9 @@ public class PlayerBase : MonoBehaviour
             Debug.ClearDeveloperConsole();
             if (Input.interact)
             {
-                Debug.Log("Tried to Interact");
                 input.interact = false;
                 if (CanInteract())
                 {
-                    Debug.Log("Was able to");
                     if(interactable == null && holding != null)
                     {
                         holding.Drop(this);
@@ -266,10 +264,6 @@ public class PlayerBase : MonoBehaviour
                     {
                         StartCoroutine(interactable.InteractRoutine(this));
                     }
-                }
-                else
-                {
-                    Debug.Log("Could Not");
                 }
             }
         }

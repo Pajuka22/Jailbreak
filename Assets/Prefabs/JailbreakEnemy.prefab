@@ -86,7 +86,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855745178104160
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -149,7 +149,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855745178745275
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -279,7 +279,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1047855745207722648}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.39, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1818295442013381209}
@@ -599,7 +599,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855746212546573
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -706,7 +706,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855746291767466
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -977,7 +977,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855745075114203
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1002,7 +1002,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.008880705, y: -0.40768686, z: -0.0005591134}
+  m_ConnectedAnchor: {x: -0.008880705, y: -0.40768686, z: -0.00055863656}
   serializedVersion: 2
   m_SwingAxis: {x: -1, y: 0, z: 0}
   m_TwistLimitSpring:
@@ -1267,7 +1267,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855746601646412
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1377,7 +1377,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855746004444776
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1402,7 +1402,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000046402585, y: -0.41696832, z: -0.0000002384299}
+  m_ConnectedAnchor: {x: -0.0000000128113005, y: -0.41696832, z: -0.00000023842986}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: -1}
   m_TwistLimitSpring:
@@ -1485,7 +1485,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855746659532391
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1593,7 +1593,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855745690052730
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1618,7 +1618,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.000000097318114, y: -0.39598608, z: -0.0037636608}
+  m_ConnectedAnchor: {x: 0.000000097318086, y: -0.39598626, z: -0.0037632287}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 1, z: 0}
   m_TwistLimitSpring:
@@ -1702,7 +1702,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!135 &1047855746101166337
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1727,7 +1727,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000046405438, y: -0.39148277, z: -0.00000017882748}
+  m_ConnectedAnchor: {x: -0.000000012782772, y: -0.39148277, z: -0.00000017882745}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: -1}
   m_TwistLimitSpring:
@@ -1841,7 +1841,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!65 &1047855745486279936
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2011,7 +2011,7 @@ MonoBehaviour:
   alertedMaterial: {fileID: 2100000, guid: 62038edd020f51548885fe294f356071, type: 2}
   lineRenderer: {fileID: 1047855745680488031}
   pointsInArc: 5
-  head: {fileID: 1047855745207722649}
+  head: {fileID: 1818295442013381209}
   sightAngle: 30
   sightRange: 10
   autoAlertRange: 5
@@ -2026,6 +2026,7 @@ MonoBehaviour:
   ghostState: 0
   currentState: 0
   framesToCatch: 60
+  headGrab: {fileID: 1047855745207722654}
   myDeadEnemies: []
 --- !u!114 &1047855745451841339
 MonoBehaviour:

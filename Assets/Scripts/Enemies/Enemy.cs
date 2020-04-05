@@ -57,7 +57,7 @@ public class Enemy : InteractionParent
     int suspicion;
     private RagdollController ragdoll;
     bool held;
-    CharacterJoint headGrab;
+    public CharacterJoint headGrab;
     public static List<Enemy> allEnemies = new List<Enemy>();
     public static List<Enemy> deadEnemies = new List<Enemy>();
     public List<Enemy> myDeadEnemies = new List<Enemy>();
@@ -67,7 +67,10 @@ public class Enemy : InteractionParent
 
     protected override void Start()
     {
-        headGrab = head.GetComponent<CharacterJoint>();
+        if (headGrab == null)
+        {
+            headGrab = head.GetComponent<CharacterJoint>();
+        }
         ragdoll = GetComponent<RagdollController>();
         if(head == null)
         {
@@ -215,6 +218,7 @@ public class Enemy : InteractionParent
         }
         else
         {
+            transform.position = head.transform.position;
         }
     }
     public IEnumerator StopAtPatrolPoint()
@@ -286,7 +290,7 @@ public class Enemy : InteractionParent
     public void Die()
     {
         deadEnemies.Add(this);
-        head.gameObject.SetActive(false);
+        //head.gameObject.SetActive(false);
         navAgent.enabled = false;
         alive = false;
         lineRenderer.enabled = false;
@@ -380,21 +384,29 @@ public class Enemy : InteractionParent
     }
     public override void InteractionReset()
     {
+        alive = true;
+
         deadEnemies.Clear();
+        myDeadEnemies.Clear();
+        alertedPlayer = null;
+
         head.gameObject.SetActive(true);
         held = false;
         headGrab.connectedBody = null;
+        headGrab.gameObject.SetActive(false);
+
+        currentState = EnemyStates.Idle;
         currentPatrolPoint = 0;
         suspicion = 0;
         transform.position = startingPoint;
         transform.rotation = startingRot;
-        alive = true;
+        
         currentPatrolPoint = 0;
         navAgent.enabled = true;
         navAgent.destination = patrolPoints[currentPatrolPoint].position;
-        currentState = EnemyStates.Idle;
+        
         rend.sharedMaterial = baseMaterial;
-        alertedPlayer = null;
+        
         enabled = true;
         canMove = true;
         ragdoll.TurnRagdollOff();
