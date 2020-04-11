@@ -123,12 +123,12 @@ ModelImporter:
       name: LockPick
       takeName: Armature|ArmatureAction
       internalID: 0
-      firstFrame: 162
+      firstFrame: 170
       lastFrame: 190
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
-      cycleOffset: 8
+      cycleOffset: 170
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
