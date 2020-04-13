@@ -49,6 +49,7 @@ public class WinCon : InteractionParent
     {
         p.canMove = false;
         p.input.velocity = Vector3.zero;
+        p.rb.velocity = Vector3.zero;
         p.transform.rotation = Quaternion.LookRotation((transform.position - p.transform.position) - Vector3.up * (transform.position.y - p.transform.position.y));
         p.input.rotation = p.transform.rotation;
         p.state = PlayerBase.States.Idle;
