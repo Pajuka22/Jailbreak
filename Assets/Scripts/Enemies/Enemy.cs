@@ -63,6 +63,7 @@ public class Enemy : InteractionParent
     public List<Enemy> myDeadEnemies = new List<Enemy>();
     private Enemy deadEnemySpotted;
     public static bool winning;
+    float highSoundSus;
     // Start is called before the first frame update
 
     protected override void Start()
@@ -94,6 +95,7 @@ public class Enemy : InteractionParent
     }
     private void FixedUpdate()
     {
+        HearSound(new SoundUtility.Sound(Vector3.zero, 2, 10));
         float nearestPlayer = sightRange + 1;
         if (alive)
         {
@@ -467,5 +469,22 @@ public class Enemy : InteractionParent
         lineRenderer.positionCount = points.Count;
         lineRenderer.SetPositions(points.ToArray());
         lineRenderer.enabled = true;
+    }
+    public void HearSound(SoundUtility.Sound sound)
+    {
+        if(Vector3.Distance(transform.position, sound.location) <= sound.maxRadius)
+        {
+            if (alertedPlayer == null)
+            {
+                NavMeshPath path = new NavMeshPath();
+                Utility.GetPath(path, transform.position, sound.location, NavMesh.AllAreas);
+                float pathLength = SoundUtility.GetPathLength(path);
+                Debug.Log("nav distance to sound: " + pathLength);
+                if (pathLength <= sound.maxRadius)
+                {
+
+                }
+            }
+        }
     }
 }
