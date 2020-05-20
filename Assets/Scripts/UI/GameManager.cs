@@ -130,6 +130,7 @@ public class GameManager : MonoBehaviour
         }
         cage.gameObject.SetActive(true);
         cage.Catch(gotCaught);
+        cage.rb.isKinematic = false;
     }
     public void LossMenu()
     {

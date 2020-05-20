@@ -47,27 +47,39 @@ public class Enemy : InteractionParent
     public float alertWinTime = 1.5f;
     
 
-    public enum EnemyStates { Idle, Suspicious, Alerted, Look}
-    public EnemyStates ghostState;
-    public EnemyStates currentState;
+    public enum States { Idle, Suspicious, Alerted, Look}
+    public enum AnimStates { IdleWalkRun, Scan, Whistle}
+    AnimStates animState;
+    public enum AlertType {None, Sound, Corpse, Player }
+    public States ghostState;
+    public States state;
+    public AlertType alert;
     bool alerted;
     float time;
     public int framesToCatch = 60;
-    private Coroutine currentCoroutine;
+    private Coroutine interruptableCoroutine;
     int suspicion;
+    float playerSus;
     private RagdollController ragdoll;
     bool held;
     public CharacterJoint headGrab;
     public static List<Enemy> allEnemies = new List<Enemy>();
     public static List<Enemy> deadEnemies = new List<Enemy>();
     public List<Enemy> myDeadEnemies = new List<Enemy>();
-    private Enemy deadEnemySpotted;
+    private Enemy alertedCorpse;
     public static bool winning;
-    float highSoundSus;
+    float soundSus;
+    public float corpseSus;
+    public Animator anim;
+
     // Start is called before the first frame update
 
     protected override void Start()
     {
+        if(anim == null)
+        {
+            anim = GetComponent<Animator>();
+        }
         if (headGrab == null)
         {
             headGrab = head.GetComponent<CharacterJoint>();
@@ -95,20 +107,185 @@ public class Enemy : InteractionParent
     }
     private void FixedUpdate()
     {
-        HearSound(new SoundUtility.Sound(Vector3.zero, 2, 10));
-        float nearestPlayer = sightRange + 1;
+        //HearSound(new SoundUtility.Sound(Vector3.zero, 2, 10));
         if (alive)
         {
-            if (canMove)
+            float nearestPlayer = sightRange + 1;
+            foreach (PlayerBase p in Players)
             {
-                if (PlayerBase.firstRun)
+                if (p != null && p.enabled && CanSeePlayer(p))
                 {
-                    time++;
+                    if (nearestPlayer > Vector3.Distance(head.position, p.transform.position))
+                    {
+                        nearestPlayer = Vector3.Distance(head.position, p.transform.position);
+                        alertedPlayer = p;
+                        playerSus++;
+                        if (interruptableCoroutine != null)
+                        {
+                            StopCoroutine(interruptableCoroutine);
+                        }
+                    }
+                    if ((p.transform.position - head.position).magnitude <= autoAlertRange || playerSus >= framesToCatch)
+                    {
+                        state = States.Alerted;
+                    }
+                    else if (state != States.Alerted)
+                    {
+                        canMove = true;
+                        state = States.Suspicious;
+                        navAgent.destination = p.transform.position;
+                        Debug.Log("Move to player");
+                    }
                 }
-                else
+            }
+            if (alertedPlayer == null)
+            {
+                float nearestDeadEnemy = sightRange;
+                foreach (Enemy e in deadEnemies)
                 {
-                    time--;
+                    if (!myDeadEnemies.Contains(e) && CanSeePosition(e.head.position))
+                    {
+                        if (Vector3.Distance(head.position, e.head.position) < nearestDeadEnemy)
+                        {
+                            myDeadEnemies.Add(e);
+                            alertedCorpse = e;
+                            state = States.Suspicious;
+                            navAgent.destination = e.head.position;
+                        }
+                    }
                 }
+            }
+            switch (state)
+            {
+                case States.Idle:
+                    rend.sharedMaterial = baseMaterial;
+                    animState = AnimStates.IdleWalkRun;
+                    // idle stuff
+                    alert = AlertType.None;
+                    if (soundSus > 0)
+                    {
+                        Debug.Log("sensed sound");
+                        alert = AlertType.Sound;
+                        state = States.Suspicious;
+                        if (interruptableCoroutine != null)
+                        {
+                            StopCoroutine(interruptableCoroutine);
+                        }
+                    }
+                    if (corpseSus > 0)
+                    {
+                        Debug.Log("sensed corpse");
+                        alert = AlertType.Corpse;
+                        state = States.Suspicious;
+                        if (interruptableCoroutine != null)
+                        {
+                            StopCoroutine(interruptableCoroutine);
+                        }
+                    }
+                    if (playerSus > 0)
+                    {
+                        Debug.Log("sensed player");
+                        alert = AlertType.Player;
+                        state = States.Suspicious;
+                        if (interruptableCoroutine != null)
+                        {
+                            StopCoroutine(interruptableCoroutine);
+                        }
+                    }
+                    navAgent.speed = 3.5f;
+                    navAgent.angularSpeed = 120;
+                    navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                    rend.sharedMaterial = baseMaterial;
+                    if (Vector3.Distance(transform.position, navAgent.destination) < destinationAcceptanceRadius)
+                    {
+                        animState = AnimStates.Scan;
+                        if (interruptableCoroutine == null)
+                        {
+                            interruptableCoroutine = StartCoroutine(StopAtPatrolPoint());
+                        }
+                    }
+                    break;
+                case States.Suspicious:
+                    animState = AnimStates.IdleWalkRun;
+                    rend.sharedMaterial = suspiciousMaterial;
+                    if (alertedPlayer != null)//CanSeePlayer(alertedPlayer)
+                    {
+                        //playerSus++;
+                        //navAgent.destination = alertedPlayer.transform.position;
+                        ForgetSound();
+                        ForgetCorpse();
+                    }
+                    else if (alertedCorpse != null)
+                    {
+                        corpseSus++;
+                        //navAgent.destination = alertedCorpse.transform.position;
+                    }
+                    alert = playerSus > corpseSus ? (playerSus > soundSus ? AlertType.Player : AlertType.Sound) : (corpseSus > soundSus ? AlertType.Corpse : AlertType.Sound);
+                    switch (alert)
+                    {
+                        case AlertType.None:
+                            playerSus = 0;
+                            corpseSus = 0;
+                            soundSus = 0;
+                            state = States.Idle;
+                            break;
+                        case AlertType.Sound:
+                            playerSus = soundSus;
+                            corpseSus = 0;
+                            if (soundSus == 0)
+                            {
+                                alert = AlertType.None;
+                            }
+                            break;
+                        case AlertType.Corpse:
+                            playerSus = 0;
+                            soundSus = 0;
+                            if (corpseSus == 0)
+                            {
+                                alert = AlertType.None;
+                            }
+                            break;
+                        case AlertType.Player:
+                            corpseSus = 0;
+                            soundSus = 0;
+                            if (playerSus == 0)
+                            {
+                                alert = AlertType.None;
+                            }
+                            break;
+                    }
+                    if ((transform.position - navAgent.destination).magnitude <= destinationAcceptanceRadius)
+                    {
+                        state = States.Look;
+                    }
+                    break;
+                case States.Look:
+                    navAgent.destination = transform.position;
+                    animState = AnimStates.Scan;
+                    if (interruptableCoroutine == null)
+                    {
+                        interruptableCoroutine = StartCoroutine(LookAround());
+                    }
+                    break;
+                case States.Alerted:
+                    animState = AnimStates.Whistle;
+                    rend.sharedMaterial = alertedMaterial;
+                    if (!PlayerBase.firstRun && !winning)
+                    {/*
+                        navAgent.speed = 0;
+                        Invoke("Win", alertWinTime);*/
+                    }
+                    else
+                    {
+                        navAgent.enabled = false;
+                    }
+                    break;
+            }
+            anim.SetInteger("State", (int)animState);
+            anim.SetFloat("Speed", navAgent.velocity.magnitude / 3.5f);
+            Debug.Log(state);
+            /*if (canMove)
+            {
                 foreach (PlayerBase p in Players)
                 {
                     if (p != null && p.enabled && CanSeePlayer(p))
@@ -121,12 +298,12 @@ public class Enemy : InteractionParent
                         }
                         if ((p.transform.position - head.position).magnitude <= autoAlertRange)
                         {
-                            currentState = EnemyStates.Alerted;
+                            state = States.Alerted;
                         }
-                        else if(currentState != EnemyStates.Alerted)
+                        else if(state != States.Alerted)
                         {
                             canMove = true;
-                            currentState = EnemyStates.Suspicious;
+                            state = States.Suspicious;
                             navAgent.destination = p.transform.position;
                         }
                     }
@@ -141,16 +318,16 @@ public class Enemy : InteractionParent
                             if(Vector3.Distance(head.position, e.head.position) < nearestDeadEnemy)
                             {
                                 myDeadEnemies.Add(e);
-                                deadEnemySpotted = e;
-                                currentState = EnemyStates.Suspicious;
+                                alertedCorpse = e;
+                                state = States.Suspicious;
                                 navAgent.destination = e.head.position;
                             }
                         }
                     }
                 }
-                switch (currentState)
+                switch (state)
                 {
-                    case EnemyStates.Idle:
+                    case States.Idle:
                         navAgent.speed = 3.5f;
                         navAgent.angularSpeed = 120;
                         rend.sharedMaterial = baseMaterial;
@@ -159,7 +336,7 @@ public class Enemy : InteractionParent
                             currentCoroutine = StartCoroutine(StopAtPatrolPoint());
                         }
                         break;
-                    case EnemyStates.Suspicious:
+                    case States.Suspicious:
                         navAgent.speed = 2.5f;
                         navAgent.angularSpeed = 30;
                         if (currentCoroutine != null)
@@ -175,7 +352,7 @@ public class Enemy : InteractionParent
                                 navAgent.destination = alertedPlayer.transform.position;
                                 if (suspicion >= framesToCatch)
                                 {
-                                    currentState = EnemyStates.Alerted;
+                                    state = States.Alerted;
                                 }
                             }
                             else
@@ -183,14 +360,14 @@ public class Enemy : InteractionParent
                                 if ((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
                                 {
                                     suspicion = 0;
-                                    //currentState = EnemyStates.Look;
+                                    //state = States.Look;
                                     StartCoroutine(LookAround());
                                 }
                             }
                         }
                         else
                         {
-                            if(deadEnemySpotted != null)
+                            if(alertedCorpse != null)
                             {
                                 if ((navAgent.destination - transform.position).magnitude <= destinationAcceptanceRadius)
                                 {
@@ -200,7 +377,7 @@ public class Enemy : InteractionParent
                             }
                         }
                         break;
-                    case EnemyStates.Alerted:
+                    case States.Alerted:
                         rend.sharedMaterial = alertedMaterial;
                         if (!PlayerBase.firstRun)
                         {
@@ -213,10 +390,10 @@ public class Enemy : InteractionParent
                         }
                         break;
                     default:
-                        Debug.Log(currentState);
+                        Debug.Log(state);
                         break;
                 }
-            }
+            }*/
         }
         else
         {
@@ -227,8 +404,8 @@ public class Enemy : InteractionParent
     {
         if (alive)
         {
-            canMove = false;
             yield return new WaitForSeconds(patrolPointStopTime);
+            Debug.Log("On to next point");
             currentPatrolPoint++;
             if (currentPatrolPoint >= patrolPoints.Count)
             {
@@ -239,18 +416,23 @@ public class Enemy : InteractionParent
                 navAgent.destination = patrolPoints[currentPatrolPoint].position;
                 canMove = true;
             }
+            interruptableCoroutine = null;
         }
     }
     public IEnumerator LookAround()
     {
         canMove = false;
-        currentState = EnemyStates.Look;
+        state = States.Look;
         yield return new WaitForSeconds(1.625f);
         suspicion = 0;
+        ForgetPlayer();
+        ForgetCorpse();
+        ForgetSound();
         canMove = true;
-        deadEnemySpotted = null;
+        alertedCorpse = null;
         alertedPlayer = null;
-        currentState = EnemyStates.Idle;
+        state = States.Idle;
+        interruptableCoroutine = null;
     }
     public bool CanSeePlayer(PlayerBase p)
     {
@@ -387,6 +569,7 @@ public class Enemy : InteractionParent
     public override void InteractionReset()
     {
         alive = true;
+        winning = false;
 
         deadEnemies.Clear();
         myDeadEnemies.Clear();
@@ -397,9 +580,12 @@ public class Enemy : InteractionParent
         headGrab.connectedBody = null;
         headGrab.gameObject.SetActive(false);
 
-        currentState = EnemyStates.Idle;
+        state = States.Idle;
         currentPatrolPoint = 0;
         suspicion = 0;
+        playerSus = 0;
+        soundSus = 0;
+        corpseSus = 0;
         transform.position = startingPoint;
         transform.rotation = startingRot;
         
@@ -420,13 +606,13 @@ public class Enemy : InteractionParent
         if (Utility.Has<PlayerBase>(collision.collider.gameObject))
         {
             alertedPlayer = collision.collider.gameObject.GetComponent<PlayerBase>();
-            currentState = EnemyStates.Alerted;
+            state = States.Alerted;
             transform.rotation = Quaternion.LookRotation(alertedPlayer.transform.position, Vector3.up);
         }
     }
     void Win()
     {
-        if (alive && !winning)
+        if (alive && !winning && !PlayerBase.firstRun)
         {
             canMove = false;
             navAgent.destination = transform.position;
@@ -472,9 +658,9 @@ public class Enemy : InteractionParent
     }
     public void HearSound(SoundUtility.Sound sound)
     {
-        if(Vector3.Distance(transform.position, sound.location) <= sound.maxRadius)
+        if (alive)
         {
-            if (alertedPlayer == null)
+            if (Vector3.Distance(transform.position, sound.location) <= sound.maxRadius)
             {
                 NavMeshPath path = new NavMeshPath();
                 Utility.GetPath(path, transform.position, sound.location, NavMesh.AllAreas);
@@ -482,9 +668,35 @@ public class Enemy : InteractionParent
                 Debug.Log("nav distance to sound: " + pathLength);
                 if (pathLength <= sound.maxRadius)
                 {
-
+                    soundSus = sound.strength / pathLength;
+                    Debug.Log(soundSus);
+                    if (soundSus > playerSus && soundSus > corpseSus)
+                    {
+                        ForgetCorpse();
+                        ForgetPlayer();
+                        navAgent.SetDestination(sound.location);
+                        alert = AlertType.Sound;
+                    }
                 }
             }
         }
+    }
+    public void ForgetCorpse()
+    {
+        if (alertedCorpse != null && !myDeadEnemies.Contains(alertedCorpse))
+        {
+            myDeadEnemies.Add(alertedCorpse);
+        }
+        alertedCorpse = null;
+        corpseSus = 0;
+    }
+    public void ForgetPlayer()
+    {
+        alertedPlayer = null;
+        playerSus = 0;
+    }
+    public void ForgetSound()
+    {
+        soundSus = 0;
     }
 }

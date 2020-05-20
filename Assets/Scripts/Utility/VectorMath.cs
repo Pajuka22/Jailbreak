@@ -19,4 +19,8 @@ public class VectorMath : MonoBehaviour
     {
         return vector.z * localSpace.forward + vector.y * localSpace.up + vector.x * localSpace.right;
     }
+    public static Vector3 ZeroY(Vector3 vectIn)
+    {
+        return new Vector3(vectIn.x, 0, vectIn.z);
+    }
 }

@@ -2024,10 +2024,12 @@ MonoBehaviour:
   alertedPlayer: {fileID: 0}
   alertWinTime: 1.5
   ghostState: 0
-  currentState: 0
+  state: 0
+  alert: 0
   framesToCatch: 60
   headGrab: {fileID: 1047855745207722654}
   myDeadEnemies: []
+  corpseSus: 0
 --- !u!114 &1047855745451841339
 MonoBehaviour:
   m_ObjectHideFlags: 0

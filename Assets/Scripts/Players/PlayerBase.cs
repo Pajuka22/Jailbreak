@@ -250,6 +250,10 @@ public class PlayerBase : MonoBehaviour
             {
                 rb.velocity = new Vector3(Input.velocity.x, rb.velocity.y, Input.velocity.z);
             }
+            else
+            {
+                rb.velocity = Vector3.zero;
+            }
             Debug.ClearDeveloperConsole();
             if (Input.interact)
             {

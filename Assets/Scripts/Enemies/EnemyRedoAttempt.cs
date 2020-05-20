@@ -8,64 +8,53 @@ using UnityEditor;
 [RequireComponent(typeof(RagdollController))]
 public class EnemyRedoAttempt : InteractionParent
 {
-    private Enemy.EnemyStates state = Enemy.EnemyStates.Idle;
-    public enum AlertType { None, Sound, Corpse, Player}
-    AlertType alert;
-    public PlayerBase alertedPlayer;
-    float soundSus;
-    float playerSus;
-    float bodySus;
-    Vector3 destination;
-    // Start is called before the first frame update
+    bool alive = true;
+    public RagdollController ragdoll;
+    public enum States { Idle, Suspicious, Alert, Look}
+    public States state;
+    //line of sight
+    public Transform head;
+    [Range(0, 180)]
+    public float sightAngle;
+    [Min(0)]
+    public float sightRange;
+    public LineRenderer lineRenderer;
+    public int linesInCurve;
+    //patrol stuff
+    public NavMeshAgent navAgent;
+    public List<Transform> patrolPoints = new List<Transform>();
+    public int pPoint;
 
-    protected override void Start()
+    //on start
+    Vector3 startingPos;
+    Quaternion startingRot;
+    PlayerBase[] players = new PlayerBase[0];
+
+
+
+    private void Start()
     {
-
+        startingPos = transform.position;
+        startingRot = transform.rotation;
+        players = FindObjectsOfType<PlayerBase>();
     }
     private void FixedUpdate()
     {
-        switch (state)
+        if (alive)
         {
-            case Enemy.EnemyStates.Idle:
-                // idle stuff
-                alert = AlertType.None;
-                if(soundSus > 0)
-                {
-                    alert = AlertType.Sound;
-
-                }
-                if(bodySus > 0)
-                {
-                    alert = AlertType.Corpse;
-                }
-                if(playerSus > 0)
-                {
-                    alert = AlertType.Player;
-                }
-                break;
-            case Enemy.EnemyStates.Suspicious:
-                break;
-            case Enemy.EnemyStates.Look:
-                break;
-            case Enemy.EnemyStates.Alerted:
-                break;
-        }
-    }
-    public void HearSound(SoundUtility.Sound sound)
-    {
-        if (Vector3.Distance(transform.position, sound.location) <= sound.maxRadius)
-        {
-            if (alertedPlayer == null)
+            float nearestPlayer = sightRange + 1;
+            foreach(PlayerBase p in players)
             {
-                NavMeshPath path = new NavMeshPath();
-                Utility.GetPath(path, transform.position, sound.location, NavMesh.AllAreas);
-                float pathLength = SoundUtility.GetPathLength(path);
-                Debug.Log("nav distance to sound: " + pathLength);
-                if (pathLength <= sound.maxRadius)
+                if((p.transform.position - transform.position).magnitude <= sightRange)
                 {
 
                 }
             }
         }
+        else
+        {
+            transform.position = head.position;
+        }
     }
+
 }

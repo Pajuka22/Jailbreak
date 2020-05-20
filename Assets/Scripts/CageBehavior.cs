@@ -12,7 +12,7 @@ public class CageBehavior : MonoBehaviour
     {
         Physics.IgnoreLayerCollision(gameObject.layer, 8);
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
         rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
     }
 
