@@ -18,6 +18,7 @@ public class InteractionParent : MonoBehaviour
     protected virtual void Start()
     {
         interactionCollider.isTrigger = true;
+        EventManager.current.resetInteractables += InteractionReset;
     }
 
     // Update is called once per frame

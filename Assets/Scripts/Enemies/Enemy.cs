@@ -8,74 +8,108 @@ using UnityEditor;
 [RequireComponent(typeof(RagdollController))]
 public class Enemy : InteractionParent
 {
-    public float startSmackTime;
-    public float endSmackTime;
-    public float startPickUpTime;
-    public float endPickUpTime;
-    public static bool PlayerLost;
-    public Vector3 startingPoint;
-    public Quaternion startingRot;
+    [SerializeField]
+    private float startSmackTime;
+    [SerializeField]
+    private float endSmackTime;
+    [SerializeField]
+    private float startPickUpTime;
+    [SerializeField]
+    private float endPickUpTime;
+    [SerializeField]
+    private static bool PlayerLost;
+    [SerializeField]
+    private Vector3 startingPoint;
+    [SerializeField]
+    private Quaternion startingRot;
     //movement and stuff
     NavMeshAgent navAgent;
-    public bool canMove = true;
-    public List<Transform> patrolPoints;
-    public int currentPatrolPoint;
-    public float patrolPointStopTime;
-    public float destinationAcceptanceRadius = 2;
+    private bool canMove = true;
+    [SerializeField]
+    private List<Transform> patrolPoints;
+    [SerializeField]
+    private int currentPatrolPoint;
+    [SerializeField]
+    private float patrolPointStopTime;
+    [SerializeField]
+    private float destinationAcceptanceRadius = 2;
     //visible changes
-    public Renderer rend;
-    public Material baseMaterial;
-    public Material suspiciousMaterial;
-    public Material alertedMaterial;
+    [SerializeField]
+    private Renderer rend;
+    [SerializeField]
+    private Material baseMaterial;
+    [SerializeField]
+    private Material suspiciousMaterial;
+    [SerializeField]
+    private Material alertedMaterial;
     //end visible changes
     //line of sight
-    public LineRenderer lineRenderer;
-    public int pointsInArc;
+    [SerializeField]
+    private LineRenderer lineRenderer;
+    [SerializeField]
+    private int pointsInArc;
     public Transform head;
+    [Range(0, 90)] 
+    [SerializeField]
+    private float sightAngle;
     [Range(0, 90)]
-    public float sightAngle;
-    public float sightRange;
-    public float autoAlertRange;
+    [SerializeField]
+    private float alarmedSightAngle;
+    [SerializeField]
+    private float sightRange;
+    [SerializeField]
+    private float alarmedSightRange;
+    [SerializeField]
+    private float autoAlertRange;
+    [SerializeField]
+    private float alarmedAutoAlertRange;
+    private float cSightAngle;
+    private float cSightRange;
+    private float cAutoAlertRange;
     //end line of sight
     //player stuff
     public PlayerBase[] Players = new PlayerBase[2];
     [System.NonSerialized]
     public bool alive = true;
-    public LayerMask blocksSight;
-    public PlayerBase alertedPlayer;
+    [SerializeField]
+    private LayerMask blocksSight;
+    [SerializeField]
+    private PlayerBase alertedPlayer;
     //end player stuff
-    public float alertWinTime = 1.5f;
+    [SerializeField]
+    private float alertWinTime = 1.5f;
     
 
     public enum States { Idle, Suspicious, Alerted, Look}
     public enum AnimStates { IdleWalkRun, Scan, Whistle}
     AnimStates animState;
     public enum AlertType {None, Sound, Corpse, Player }
-    public States ghostState;
-    public States state;
-    public AlertType alert;
-    bool alerted;
-    float time;
+    [SerializeField]
+    private States state;
+    [SerializeField]
+    private AlertType alert;
     public int framesToCatch = 60;
     private Coroutine interruptableCoroutine;
-    int suspicion;
     float playerSus;
     private RagdollController ragdoll;
     bool held;
     public CharacterJoint headGrab;
     public static List<Enemy> allEnemies = new List<Enemy>();
     public static List<Enemy> deadEnemies = new List<Enemy>();
-    public List<Enemy> myDeadEnemies = new List<Enemy>();
+    private  List<Enemy> myDeadEnemies = new List<Enemy>();
     private Enemy alertedCorpse;
     public static bool winning;
     float soundSus;
-    public float corpseSus;
-    public Animator anim;
+    private float corpseSus;
+    [SerializeField]
+    private Animator anim;
+    private float suspicion;
 
     // Start is called before the first frame update
 
     protected override void Start()
     {
+        EventManager.current.soundAlarm += GetAlarmed;
         if(anim == null)
         {
             anim = GetComponent<Animator>();
@@ -100,17 +134,31 @@ public class Enemy : InteractionParent
         {
             navAgent = GetComponent<NavMeshAgent>();
         }
+        cSightRange = sightRange;
+        cSightAngle = sightAngle;
+        cAutoAlertRange = autoAlertRange;
         ResetSightCone();
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
         base.Start();
+        EventManager.current.soundAlarm += GetAlarmed;
+    }
+    void GetAlarmed()
+    {
+        if (alive)
+        {
+            cSightAngle = alarmedSightAngle;
+            cSightRange = alarmedSightRange;
+            cAutoAlertRange = alarmedAutoAlertRange;
+            ResetSightCone();
+        }
     }
     private void FixedUpdate()
     {
         //HearSound(new SoundUtility.Sound(Vector3.zero, 2, 10));
         if (alive)
         {
-            float nearestPlayer = sightRange + 1;
+            float nearestPlayer = cSightRange + 1;
             foreach (PlayerBase p in Players)
             {
                 if (p != null && p.enabled && CanSeePlayer(p))
@@ -125,9 +173,10 @@ public class Enemy : InteractionParent
                             StopCoroutine(interruptableCoroutine);
                         }
                     }
-                    if ((p.transform.position - head.position).magnitude <= autoAlertRange || playerSus >= framesToCatch)
+                    if ((p.transform.position - head.position).magnitude <= cAutoAlertRange || playerSus >= framesToCatch)
                     {
                         state = States.Alerted;
+                        navAgent.destination = transform.position;
                     }
                     else if (state != States.Alerted)
                     {
@@ -140,7 +189,7 @@ public class Enemy : InteractionParent
             }
             if (alertedPlayer == null)
             {
-                float nearestDeadEnemy = sightRange;
+                float nearestDeadEnemy = cSightRange;
                 foreach (Enemy e in deadEnemies)
                 {
                     if (!myDeadEnemies.Contains(e) && CanSeePosition(e.head.position))
@@ -277,7 +326,7 @@ public class Enemy : InteractionParent
                     }
                     else
                     {
-                        navAgent.enabled = false;
+                        //navAgent.enabled = false;
                     }
                     break;
             }
@@ -438,16 +487,16 @@ public class Enemy : InteractionParent
     {
         if (p != null)
         {
-            return (p.head.position - head.position).magnitude <= sightRange
-                && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * sightAngle
+            return (p.head.position - head.position).magnitude <= cSightRange
+                && VectorMath.RadiansToVector(p.head.position - head.position, head.forward) <= Mathf.Deg2Rad * cSightAngle
                 && !Physics.Linecast(head.position, p.head.position, blocksSight);
         }
         return false;
     }
     public bool CanSeePosition(Vector3 pos)
     {
-        return (pos - head.position).magnitude <= sightRange &&
-            VectorMath.RadiansToVector(pos - head.position, head.forward) <= Mathf.Deg2Rad * sightAngle &&
+        return (pos - head.position).magnitude <= cSightRange &&
+            VectorMath.RadiansToVector(pos - head.position, head.forward) <= Mathf.Deg2Rad * cSightAngle &&
             !Physics.Linecast(head.position, pos, blocksSight);
     }
     public override void Interact(PlayerBase playerBase)
@@ -598,6 +647,9 @@ public class Enemy : InteractionParent
         enabled = true;
         canMove = true;
         ragdoll.TurnRagdollOff();
+        cSightAngle = sightAngle;
+        cSightRange = sightRange;
+        cAutoAlertRange = autoAlertRange;
         ResetSightCone();
         GetComponent<CapsuleCollider>().enabled = true;
     }
@@ -630,26 +682,26 @@ public class Enemy : InteractionParent
     }
     void ResetSightCone()
     {
-        float coneRad = sightAngle * Mathf.PI / 180;
-        float baseRadius = sightRange * Mathf.Sin(coneRad);
+        float coneRad = cSightAngle * Mathf.PI / 180;
+        float baseRadius = cSightRange * Mathf.Sin(coneRad);
         //lineRenderer.positionCount = 26 + 2 * pointsInArc;
         List<Vector3> points = new List<Vector3>();
-        points.Add(new Vector3(0, 0, sightRange));
+        points.Add(new Vector3(0, 0, cSightRange));
         points.Add(Vector3.zero);
         //points.Add(sightRange * new Vector3(Mathf.Sin(coneRad), Mathf.Cos(coneRad), 0));
         for (int i = 5; i >= -5; i--)
         {
-            points.Add(sightRange * new Vector3(Mathf.Sin(coneRad * i / 5), 0, Mathf.Cos(coneRad * i / 5)));
+            points.Add(cSightRange * new Vector3(Mathf.Sin(coneRad * i / 5), 0, Mathf.Cos(coneRad * i / 5)));
         }
         points.Add(Vector3.zero);
 
         for (int i = 5; i >= -5; i--)
         {
-            points.Add(sightRange * new Vector3(0, Mathf.Sin(coneRad * i / 5), Mathf.Cos(coneRad * i / 5)));
+            points.Add(cSightRange * new Vector3(0, Mathf.Sin(coneRad * i / 5), Mathf.Cos(coneRad * i / 5)));
         }
         for (int i = 0; i <= 20; i++)
         {
-            points.Add(new Vector3(baseRadius * Mathf.Sin(2 * Mathf.PI * i / 20 + Mathf.PI), baseRadius * Mathf.Cos(2 * Mathf.PI * i / 20 + Mathf.PI), sightRange * Mathf.Cos(coneRad)));
+            points.Add(new Vector3(baseRadius * Mathf.Sin(2 * Mathf.PI * i / 20 + Mathf.PI), baseRadius * Mathf.Cos(2 * Mathf.PI * i / 20 + Mathf.PI), cSightRange * Mathf.Cos(coneRad)));
         }
         points.Add(Vector3.zero);
         lineRenderer.positionCount = points.Count;
