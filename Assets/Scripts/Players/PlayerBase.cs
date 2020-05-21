@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -305,14 +306,15 @@ public class PlayerBase : MonoBehaviour
     {
         if (firstRun)
         {
-            InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();
+            /*InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();
             for (int i = 0; i < interactables.Length; i++)
             {
                 if (interactables[i] != null)
                 {
                     interactables[i].InteractionReset();
                 }
-            }
+            }*/
+            EventManager.current.ResetInteractables();
         }
         CameraFollowPlayer[] cameras = FindObjectsOfType<CameraFollowPlayer>();
         foreach (CameraFollowPlayer cam in cameras)

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,15 +19,18 @@ public class GameManager : MonoBehaviour
     public bool isGameOver = false;
     public static int index = 0;
     private int buttons;
+    public static GameManager current;
     // Start is called before the first frame update
     void Start()
     {
+        current = this;
         Physics.IgnoreLayerCollision(cage.gameObject.layer, 8);
         cage.gameObject.SetActive(false);
         restartMenu.gameObject.SetActive(false);
         pauseMenu.gameObject.SetActive(false);
         gameOverMenu.gameObject.SetActive(false);
     }
+
 
     // Update is called once per frame
     void Update()

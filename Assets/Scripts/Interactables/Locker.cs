@@ -36,6 +36,7 @@ public class Locker : InteractionParent
         wasOpen = open;
         open = false;
         doorRenderer.sharedMaterial = locked ? lockedMat : unlockedMat;
+        base.Start();
     }
 
     // Update is called once per frame
