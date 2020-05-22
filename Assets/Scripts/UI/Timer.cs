@@ -6,9 +6,10 @@ using System;
 
 public class Timer : MonoBehaviour
 {
-    float time = 0;
+    public static float time = 0;
     [SerializeField]
-    float AlarmTime = 5;
+    float alarmTime = 5;
+    public RectTransform hand;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,9 +24,13 @@ public class Timer : MonoBehaviour
     private void FixedUpdate()
     {
         time += Time.fixedDeltaTime;
-        if(time >= AlarmTime)
+        if(time >= alarmTime)
         {
             EventManager.current.SoundAlarm();
+        }
+        else
+        {
+            hand.rotation = Quaternion.Euler(0, 0, 360 * (time - alarmTime) / alarmTime + 180);
         }
     }
     void ResetAlarm()
