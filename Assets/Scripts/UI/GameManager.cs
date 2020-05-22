@@ -7,10 +7,14 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public CameraFollowPlayer cam;
-    public CageBehavior cage;
-    public MenuManager pauseMenu;
-    public MenuManager restartMenu;
-    public MenuManager gameOverMenu;
+    [SerializeField]
+    private CageBehavior cage;
+    [SerializeField]
+    private MenuManager pauseMenu;
+    [SerializeField]
+    private MenuManager restartMenu;
+    [SerializeField]
+    private MenuManager gameOverMenu;
     [System.NonSerialized]
     public bool paused = false;
     [System.NonSerialized]
@@ -20,6 +24,7 @@ public class GameManager : MonoBehaviour
     public static int index = 0;
     private int buttons;
     public static GameManager current;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -181,6 +186,7 @@ public class GameManager : MonoBehaviour
     }
     void RestartWhole()
     {
+        Debug.Log("Full Restart");
         PlayerBase.firstRun = true;
         restarting = false;
         paused = false;
@@ -221,6 +227,7 @@ public class GameManager : MonoBehaviour
         {
             RestartWhole();
         }
+        isGameOver = false;
         SetAllMenus(false);
     }
     void SetAllMenus(bool on)

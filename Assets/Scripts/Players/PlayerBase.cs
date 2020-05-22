@@ -130,7 +130,6 @@ public class PlayerBase : MonoBehaviour
         if (Input.GetButtonDown("Interact"))
         {
             input.interact = true;
-            Debug.Log("InteractPressed");
         }
         //end movement keys up
         direction.Normalize();
@@ -304,6 +303,7 @@ public class PlayerBase : MonoBehaviour
     }
     public void GhostSwap()
     {
+        Debug.Log("SWAP");
         if (firstRun)
         {
             /*InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();

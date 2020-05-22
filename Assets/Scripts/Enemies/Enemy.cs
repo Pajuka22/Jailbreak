@@ -168,10 +168,7 @@ public class Enemy : InteractionParent
                         nearestPlayer = Vector3.Distance(head.position, p.transform.position);
                         alertedPlayer = p;
                         playerSus++;
-                        if (interruptableCoroutine != null)
-                        {
-                            StopCoroutine(interruptableCoroutine);
-                        }
+                        InterruptCoroutine();
                     }
                     if ((p.transform.position - head.position).magnitude <= cAutoAlertRange || playerSus >= framesToCatch)
                     {
@@ -183,7 +180,6 @@ public class Enemy : InteractionParent
                         canMove = true;
                         state = States.Suspicious;
                         navAgent.destination = p.transform.position;
-                        Debug.Log("Move to player");
                     }
                 }
             }
@@ -216,30 +212,21 @@ public class Enemy : InteractionParent
                         Debug.Log("sensed sound");
                         alert = AlertType.Sound;
                         state = States.Suspicious;
-                        if (interruptableCoroutine != null)
-                        {
-                            StopCoroutine(interruptableCoroutine);
-                        }
+                        InterruptCoroutine();
                     }
                     if (corpseSus > 0)
                     {
                         Debug.Log("sensed corpse");
                         alert = AlertType.Corpse;
                         state = States.Suspicious;
-                        if (interruptableCoroutine != null)
-                        {
-                            StopCoroutine(interruptableCoroutine);
-                        }
+                        InterruptCoroutine();
                     }
                     if (playerSus > 0)
                     {
                         Debug.Log("sensed player");
                         alert = AlertType.Player;
                         state = States.Suspicious;
-                        if (interruptableCoroutine != null)
-                        {
-                            StopCoroutine(interruptableCoroutine);
-                        }
+                        InterruptCoroutine();
                     }
                     navAgent.speed = 3.5f;
                     navAgent.angularSpeed = 120;
@@ -330,9 +317,9 @@ public class Enemy : InteractionParent
                     }
                     break;
             }
+            Debug.Log(state);
             anim.SetInteger("State", (int)animState);
             anim.SetFloat("Speed", navAgent.velocity.magnitude / 3.5f);
-            Debug.Log(state);
             /*if (canMove)
             {
                 foreach (PlayerBase p in Players)
@@ -454,7 +441,6 @@ public class Enemy : InteractionParent
         if (alive)
         {
             yield return new WaitForSeconds(patrolPointStopTime);
-            Debug.Log("On to next point");
             currentPatrolPoint++;
             if (currentPatrolPoint >= patrolPoints.Count)
             {
@@ -750,5 +736,13 @@ public class Enemy : InteractionParent
     public void ForgetSound()
     {
         soundSus = 0;
+    }
+    void InterruptCoroutine()
+    {
+        if(interruptableCoroutine != null)
+        {
+            StopCoroutine(interruptableCoroutine);
+            interruptableCoroutine = null;
+        }
     }
 }
