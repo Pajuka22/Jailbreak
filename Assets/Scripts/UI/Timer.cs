@@ -33,7 +33,7 @@ public class Timer : MonoBehaviour
             hand.rotation = Quaternion.Euler(0, 0, 360 * (time - alarmTime) / alarmTime + 180);
         }
     }
-    void ResetAlarm()
+    public static void ResetAlarm()
     {
         time = 0;
     }

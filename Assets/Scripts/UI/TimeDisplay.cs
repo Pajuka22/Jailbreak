@@ -20,6 +20,6 @@ public class  TimeDisplay : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        text.text = string.Format("{0}:{1}", Mathf.Floor(Timer.time / 60).ToString("00"), (Timer.time % 60).ToString("00"));
+        text.text = string.Format("{0}:{1}", Mathf.FloorToInt(Timer.time / 60).ToString("00"), Mathf.FloorToInt(Timer.time % 60).ToString("00"));
     }
 }

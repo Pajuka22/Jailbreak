@@ -196,6 +196,7 @@ public class GameManager : MonoBehaviour
     }
     void RestartJustSmacky()
     {
+        Timer.ResetAlarm();
         cage.gameObject.SetActive(false);
         restarting = false;
         if (!PlayerBase.firstRun)
