@@ -109,6 +109,7 @@ public class Enemy : InteractionParent
 
     protected override void Start()
     {
+        EventManager.current.hearSound += HearSound;
         EventManager.current.soundAlarm += GetAlarmed;
         if(anim == null)
         {
@@ -141,7 +142,6 @@ public class Enemy : InteractionParent
         navAgent.destination = patrolPoints[0].transform.position;
         currentPatrolPoint = 0;
         base.Start();
-        EventManager.current.soundAlarm += GetAlarmed;
     }
     void GetAlarmed()
     {
@@ -155,7 +155,6 @@ public class Enemy : InteractionParent
     }
     private void FixedUpdate()
     {
-        //HearSound(new SoundUtility.Sound(Vector3.zero, 2, 10));
         if (alive)
         {
             float nearestPlayer = cSightRange + 1;
@@ -257,6 +256,7 @@ public class Enemy : InteractionParent
                         //navAgent.destination = alertedCorpse.transform.position;
                     }
                     alert = playerSus > corpseSus ? (playerSus > soundSus ? AlertType.Player : AlertType.Sound) : (corpseSus > soundSus ? AlertType.Corpse : AlertType.Sound);
+                    Debug.Log(alert);
                     switch (alert)
                     {
                         case AlertType.None:
@@ -713,6 +713,7 @@ public class Enemy : InteractionParent
                         ForgetCorpse();
                         ForgetPlayer();
                         navAgent.SetDestination(sound.location);
+                        state = States.Suspicious;
                         alert = AlertType.Sound;
                     }
                 }

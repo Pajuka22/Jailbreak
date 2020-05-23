@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -274,6 +275,7 @@ public class PlayerBase : MonoBehaviour
     }
     private bool CanInteract()
     {
+        EventManager.current.MakeSound(new SoundUtility.Sound(Vector3.zero, 10, 5));
         return holding != null || (interactable != null ? (interactable.doesItFuckingMatter ? (canPickLocks ? interactable.shouldPickLocks : interactable.shouldSmack ): true) && canMove : false);
     }
     private void OnTriggerEnter(Collider other)
@@ -303,6 +305,7 @@ public class PlayerBase : MonoBehaviour
     }
     public void GhostSwap()
     {
+        
         Debug.Log("SWAP");
         if (firstRun)
         {

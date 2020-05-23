@@ -28,4 +28,9 @@ public class EventManager : MonoBehaviour
     {
         soundAlarm?.Invoke();
     }
+    public event Action <SoundUtility.Sound> hearSound;
+    public void MakeSound(SoundUtility.Sound sound)
+    {
+        hearSound?.Invoke(sound);
+    }
 }
