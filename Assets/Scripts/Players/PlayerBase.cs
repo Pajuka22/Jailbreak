@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(RagdollController))]
 public class PlayerBase : MonoBehaviour
 {
     public struct Inputs
@@ -52,12 +53,26 @@ public class PlayerBase : MonoBehaviour
     [System.NonSerialized]
     public InteractionParent holding;
     public GameObject interactionIndicator;
-
+    private RagdollController ragdoll;
     // Start is called before the first frame update
     void Start()
     {
+        ragdoll = GetComponent<RagdollController>();
+        foreach(Rigidbody rb in ragdoll.ragdollColliders)
+        {
+            if (rb.GetComponent<Collider>() != null)
+            {
+                rb.GetComponent<Collider>().enabled = false;
+            }
+        }
+        if (Utility.Has<Collider>(gameObject))
+        {
+            GetComponent<Collider>().enabled = true;
+        }
+        EventManager.current.timeOut += Explode;
         Physics.IgnoreLayerCollision(gameObject.layer, gameObject.layer);
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = false;
         startPositions.Add(transform.position);
         if (canPickLocks)
         {
@@ -275,7 +290,7 @@ public class PlayerBase : MonoBehaviour
     }
     private bool CanInteract()
     {
-        EventManager.current.MakeSound(new SoundUtility.Sound(Vector3.zero, 10, 5));
+        EventManager.current.MakeSound(new SoundUtility.Sound(Vector3.zero, 100, 5));
         return holding != null || (interactable != null ? (interactable.doesItFuckingMatter ? (canPickLocks ? interactable.shouldPickLocks : interactable.shouldSmack ): true) && canMove : false);
     }
     private void OnTriggerEnter(Collider other)
@@ -344,5 +359,19 @@ public class PlayerBase : MonoBehaviour
                 otherPlayer.input.velocity = Vector3.zero;
             }
         }
+    }
+    void Explode()
+    {
+        ragdoll.TurnRagdollOn();
+        foreach(Rigidbody rb in ragdoll.ragdollColliders)
+        {
+            rb.AddExplosionForce(700, transform.position + Vector3.up, 1.5f);
+        }
+        Invoke("GameOver", 1);
+    }
+    void GameOver()
+    {
+        canMove = false;
+        GameManager.current.LossMenu();
     }
 }

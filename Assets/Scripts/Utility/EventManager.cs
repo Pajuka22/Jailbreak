@@ -28,6 +28,11 @@ public class EventManager : MonoBehaviour
     {
         soundAlarm?.Invoke();
     }
+    public event Action timeOut;
+    public void TimeOut()
+    {
+        timeOut?.Invoke();
+    }
     public event Action <SoundUtility.Sound> hearSound;
     public void MakeSound(SoundUtility.Sound sound)
     {

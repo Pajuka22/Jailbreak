@@ -662,7 +662,7 @@ public class Enemy : InteractionParent
             alertedPlayer.otherPlayer.canMove = false;
             alertedPlayer.anim.SetInteger("state", 0);
             alertedPlayer.otherPlayer.anim.SetInteger("state", 0);
-            FindObjectOfType<GameManager>().GameOver(alertedPlayer);
+            GameManager.current.GameOver(alertedPlayer);
             winning = true;
         }
     }

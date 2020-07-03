@@ -8,8 +8,9 @@ public class Timer : MonoBehaviour
 {
     public static float time = 0;
     [SerializeField]
-    float alarmTime = 5;
+    static float alarmTime = 5;
     public RectTransform hand;
+    static bool hasRung = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,9 +25,14 @@ public class Timer : MonoBehaviour
     private void FixedUpdate()
     {
         time += Time.fixedDeltaTime;
-        if(time >= alarmTime)
+        if(time >= alarmTime / 2 && !hasRung)
         {
             EventManager.current.SoundAlarm();
+            hasRung = true;
+        }
+        if(time >= alarmTime)
+        {
+            EventManager.current.TimeOut();
         }
         else
         {
@@ -35,6 +41,7 @@ public class Timer : MonoBehaviour
     }
     public static void ResetAlarm()
     {
+        hasRung = false;
         time = 0;
     }
 }

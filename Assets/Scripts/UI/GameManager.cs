@@ -143,6 +143,7 @@ public class GameManager : MonoBehaviour
     }
     public void LossMenu()
     {
+        buttons = 2;
         cam.toFollow.canMove = false;
         cam.otherPlayer.canMove = false;
         gameOverMenu.gameObject.SetActive(true);
@@ -188,6 +189,10 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Full Restart");
         PlayerBase.firstRun = true;
+        /*cam.toFollow.rb.isKinematic = false;
+        cam.toFollow.rb.useGravity = false;
+        cam.otherPlayer.rb.isKinematic = false;
+        cam.otherPlayer.rb.useGravity = false;*/
         restarting = false;
         paused = false;
         Time.timeScale = 1;

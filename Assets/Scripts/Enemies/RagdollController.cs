@@ -5,7 +5,8 @@ using UnityEngine;
 public class RagdollController : MonoBehaviour
 {
     public Animator anim;
-    private List<Rigidbody> ragdollColliders = new List<Rigidbody>();
+    [System.NonSerialized]
+    public List<Rigidbody> ragdollColliders = new List<Rigidbody>();
     // Start is called before the first frame update
     void Start()
     {
@@ -25,9 +26,17 @@ public class RagdollController : MonoBehaviour
     {
         foreach(Rigidbody rb in GetComponentsInChildren<Rigidbody>())
         {
-            ragdollColliders.Add(rb);
-            rb.isKinematic = true;
+            if (rb != GetComponent<Rigidbody>())
+            {
+                ragdollColliders.Add(rb);
+                rb.isKinematic = true;
+            }
         }
+        /*if (GetComponent<Rigidbody>() != null)
+        {
+            ragdollColliders.Remove(GetComponent<Rigidbody>());
+            GetComponent<Rigidbody>().isKinematic = false;
+        }*/
     }
     public void TurnRagdollOn()
     {
@@ -35,6 +44,7 @@ public class RagdollController : MonoBehaviour
         foreach (Rigidbody rb in ragdollColliders)
         {
             rb.isKinematic = false;
+            rb.useGravity = true;
         }
     }
     public void TurnRagdollOff()
@@ -43,6 +53,7 @@ public class RagdollController : MonoBehaviour
         foreach (Rigidbody rb in ragdollColliders)
         {
             rb.isKinematic = true;
+            rb.useGravity = false;
         }
     }
 }
