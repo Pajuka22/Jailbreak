@@ -11,6 +11,7 @@ public class Timer : MonoBehaviour
     static float alarmTime = 5;
     public RectTransform hand;
     static bool hasRung = false;
+    static bool hasGoneBoom = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,9 +31,10 @@ public class Timer : MonoBehaviour
             EventManager.current.SoundAlarm();
             hasRung = true;
         }
-        if(time >= alarmTime)
+        if(time >= alarmTime && !hasGoneBoom)
         {
             EventManager.current.TimeOut();
+            hasGoneBoom = true;
         }
         else
         {
@@ -42,6 +44,7 @@ public class Timer : MonoBehaviour
     public static void ResetAlarm()
     {
         hasRung = false;
+        hasGoneBoom = false;
         time = 0;
     }
 }

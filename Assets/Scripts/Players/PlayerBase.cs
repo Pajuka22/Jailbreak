@@ -57,6 +57,7 @@ public class PlayerBase : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        interactionIndicator.SetActive(false);
         ragdoll = GetComponent<RagdollController>();
         foreach(Rigidbody rb in ragdoll.ragdollColliders)
         {
@@ -362,12 +363,26 @@ public class PlayerBase : MonoBehaviour
     }
     void Explode()
     {
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        rb.velocity = Vector3.zero;
         ragdoll.TurnRagdollOn();
         foreach(Rigidbody rb in ragdoll.ragdollColliders)
         {
             rb.AddExplosionForce(700, transform.position + Vector3.up, 1.5f);
+            if(rb.GetComponent<Collider>() != null)
+            {
+                rb.GetComponent<Collider>().enabled = true;
+            }
         }
         Invoke("GameOver", 1);
+    }
+    public void Unlose()
+    {
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        canMove = true;
+        ragdoll.Unexplode();
     }
     void GameOver()
     {

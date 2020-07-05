@@ -212,8 +212,9 @@ public class GameManager : MonoBehaviour
             {
                 i.InteractionReset();
             }
-            cam.toFollow.canMove = true;
-            cam.otherPlayer.canMove = true;
+            EventManager.current.ResetInteractables();
+            cam.toFollow.Unlose();
+            cam.otherPlayer.Unlose();
             if (cam.toFollow.canPickLocks)
             {
                 cam.otherPlayer.transform.position = cam.otherPlayer.startPositions[0];
