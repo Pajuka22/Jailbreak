@@ -139,8 +139,11 @@ public class Enemy : InteractionParent
         cSightAngle = sightAngle;
         cAutoAlertRange = autoAlertRange;
         ResetSightCone();
-        navAgent.destination = patrolPoints[0].transform.position;
-        currentPatrolPoint = 0;
+        if (patrolPoints[1] != null)
+        {
+            navAgent.destination = patrolPoints[0].transform.position;
+            currentPatrolPoint = 0;
+        }
         base.Start();
     }
     void GetAlarmed()
@@ -229,7 +232,10 @@ public class Enemy : InteractionParent
                     }
                     navAgent.speed = 3.5f;
                     navAgent.angularSpeed = 120;
-                    navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                    if (patrolPoints[currentPatrolPoint] != null)
+                    {
+                        navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                    }
                     rend.sharedMaterial = baseMaterial;
                     if (Vector3.Distance(transform.position, navAgent.destination) < destinationAcceptanceRadius)
                     {
@@ -448,7 +454,10 @@ public class Enemy : InteractionParent
             }
             if (alive)
             {
-                navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                if (patrolPoints[currentPatrolPoint] != null)
+                {
+                    navAgent.destination = patrolPoints[currentPatrolPoint].position;
+                }
                 canMove = true;
             }
             interruptableCoroutine = null;
