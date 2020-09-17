@@ -14,6 +14,7 @@ public class InteractionParent : MonoBehaviour
     protected bool smacked;
     public Collider interactionCollider;
     public Transform indicatorLocation;
+    
     // Start is called before the first frame update
     protected virtual void Start()
     {

@@ -124,7 +124,7 @@ ModelImporter:
       takeName: Armature|ArmatureAction
       internalID: 0
       firstFrame: 170
-      lastFrame: 190
+      lastFrame: 188
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -143,7 +143,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.9970735
+        functionName: DoInteraction
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 3132aec0d30300d4bad077fb5f99b788,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9970735
+        functionName: CanMoveTrue
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 3132aec0d30300d4bad077fb5f99b788,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

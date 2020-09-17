@@ -6,7 +6,7 @@ using UnityEditor;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(RagdollController))]
-public class Enemy : InteractionParent
+public class Enemy : InteractRedo
 {
     [SerializeField]
     private float startSmackTime;
@@ -107,7 +107,7 @@ public class Enemy : InteractionParent
 
     // Start is called before the first frame update
 
-    protected override void Start()
+    void Start()
     {
         EventManager.current.hearSound += HearSound;
         EventManager.current.soundAlarm += GetAlarmed;
@@ -124,7 +124,7 @@ public class Enemy : InteractionParent
         {
             head = transform;
         }
-        shouldPickLocks = false;
+        intType = InteractionType.both;
         startingPoint = transform.position;
         startingRot = transform.rotation;
         if(rend == null)
@@ -144,7 +144,6 @@ public class Enemy : InteractionParent
             navAgent.destination = patrolPoints[0].transform.position;
             currentPatrolPoint = 0;
         }
-        base.Start();
     }
     void GetAlarmed()
     {
@@ -545,7 +544,7 @@ public class Enemy : InteractionParent
         p.holding = null;
         Physics.IgnoreLayerCollision(gameObject.layer, 8, false);
     }
-    public override IEnumerator InteractRoutine(PlayerBase p)
+    public IEnumerator InteractRoutine(PlayerBase p)
     {
         canMove = false;
         if (navAgent.enabled)
@@ -556,14 +555,14 @@ public class Enemy : InteractionParent
         }
         if (alive)
         {
-            startInteractionTime = startSmackTime;
-            endInteractionTime = endSmackTime;
+            //startInteractionTime = startSmackTime;
+            //endInteractionTime = endSmackTime;
             deadEnemies.Add(this);
         }
         else
         {
-            startInteractionTime = startPickUpTime;
-            endInteractionTime = endPickUpTime;
+            //startInteractionTime = startPickUpTime;
+            //endInteractionTime = endPickUpTime;
         }
         //start base stuff but slightly edited
         p.canMove = false;
@@ -578,7 +577,7 @@ public class Enemy : InteractionParent
             Debug.Log("Drop the fucking body");
             p.holding.Drop(p);
         }
-        if (doesItFuckingMatter)
+        if (intType != InteractionType.both)
         {
             if (p.canPickLocks)
             {
@@ -602,9 +601,9 @@ public class Enemy : InteractionParent
             }
         }
         p.anim.SetInteger("state", (int)p.input.state);
-        yield return new WaitForSeconds(startInteractionTime);
+        yield return new WaitForSeconds(.2f);
         Interact(p);
-        yield return new WaitForSeconds(endInteractionTime);
+        yield return new WaitForSeconds(.2f);
         p.canMove = true;
         p.state = PlayerBase.States.Idle;
         p.input.state = PlayerBase.States.Idle;

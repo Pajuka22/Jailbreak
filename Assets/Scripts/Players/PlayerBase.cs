@@ -18,7 +18,7 @@ public class PlayerBase : MonoBehaviour
     }
     public Inputs input;
     public List<Inputs> ghostInputs = new List<Inputs>();
-    public enum States { Idle, Sneak, Run, LockPick, Smack, PickUp, Drag};
+    public enum States { Idle, Sneak, Run, Drag, LockPick, Smack, PickUp};
     public States state;
     public PlayerBase otherPlayer;
     public bool canPickLocks;
@@ -45,13 +45,13 @@ public class PlayerBase : MonoBehaviour
     public float speed;
     public float sneakSpeed;
     public float encumberedSpeed;
-    private InteractionParent interactable;
-    private List<InteractionParent> allInteractables = new List<InteractionParent>();
+    private InteractRedo interactable;
+    private List<InteractRedo> allInteractables = new List<InteractRedo>();
     bool sneaking;
     public Transform head;
     public Transform leftHand;
     [System.NonSerialized]
-    public InteractionParent holding;
+    public InteractRedo holding;
     public GameObject interactionIndicator;
     private RagdollController ragdoll;
     // Start is called before the first frame update
@@ -283,7 +283,17 @@ public class PlayerBase : MonoBehaviour
                     }
                     else
                     {
-                        StartCoroutine(interactable.InteractRoutine(this));
+                        if(interactable.intAnim != States.Idle)
+                        {
+                            state = interactable.intAnim;
+                            anim.SetInteger("state", (int)state);
+                            CanMoveFalse();
+                        }
+                        else
+                        {
+                            DoInteraction();
+                        }
+                        //StartCoroutine(interactable.InteractRoutine(this));
                     }
                 }
             }
@@ -292,23 +302,26 @@ public class PlayerBase : MonoBehaviour
     private bool CanInteract()
     {
         EventManager.current.MakeSound(new SoundUtility.Sound(Vector3.zero, 100, 5));
-        return holding != null || (interactable != null ? (interactable.doesItFuckingMatter ? (canPickLocks ? interactable.shouldPickLocks : interactable.shouldSmack ): true) && canMove : false);
+        return holding != null || (interactable != null ? 
+            (canPickLocks ? interactable.intType != InteractRedo.InteractionType.smack : interactable.intType != InteractRedo.InteractionType.pick) && canMove :
+            false);
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (Utility.Has<InteractionParent>(other.transform.root.gameObject) && 
-            other == other.transform.root.gameObject.GetComponent<InteractionParent>().interactionCollider)
+
+        if (Utility.Has<InteractRedo>(other.transform.root.gameObject) && 
+            other == other.transform.root.gameObject.GetComponent<InteractRedo>().interactionCollider)
         {
-            interactable = other.transform.root.gameObject.GetComponent<InteractionParent>();
+            interactable = other.transform.root.gameObject.GetComponent<InteractRedo>();
             allInteractables.Add(interactable);
         }
     }
     private void OnTriggerExit(Collider other)
     {
-        if (Utility.Has<InteractionParent>(other.transform.root.gameObject)&&
-            other == other.transform.root.gameObject.GetComponent<InteractionParent>().interactionCollider)
+        if (Utility.Has<InteractRedo>(other.transform.root.gameObject)&&
+            other == other.transform.root.gameObject.GetComponent<InteractRedo>().interactionCollider)
         {
-            allInteractables.Remove(other.transform.root.gameObject.GetComponent<InteractionParent>());
+            allInteractables.Remove(other.transform.root.gameObject.GetComponent<InteractRedo>());
             if (allInteractables.Count > 0)
             {
                 interactable = allInteractables[allInteractables.Count - 1];
@@ -325,7 +338,7 @@ public class PlayerBase : MonoBehaviour
         Debug.Log("SWAP");
         if (firstRun)
         {
-            /*InteractionParent[] interactables = FindObjectsOfType<InteractionParent>();
+            /*InteractRedo[] interactables = FindObjectsOfType<InteractRedo>();
             for (int i = 0; i < interactables.Length; i++)
             {
                 if (interactables[i] != null)
@@ -376,6 +389,25 @@ public class PlayerBase : MonoBehaviour
             }
         }
         Invoke("GameOver", 1);
+    }
+    void CanMoveFalse()
+    {
+        input.velocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+        canMove = false;
+        transform.rotation = Quaternion.LookRotation(VectorMath.ZeroY(interactable.transform.position - transform.position));
+        input.rotation = transform.rotation;
+    }
+    void CanMoveTrue()
+    {
+        canMove = true;
+        state = States.Idle;
+        input.state = States.Idle;
+        anim.SetInteger("state", (int)input.state);
+    }
+    void DoInteraction()
+    {
+        interactable.Interact(this);
     }
     public void Unlose()
     {

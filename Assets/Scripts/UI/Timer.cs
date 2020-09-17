@@ -8,7 +8,7 @@ public class Timer : MonoBehaviour
 {
     public static float time = 0;
     [SerializeField]
-    static float alarmTime = 5;
+    static float alarmTime = 50;
     public RectTransform hand;
     static bool hasRung = false;
     static bool hasGoneBoom = false;

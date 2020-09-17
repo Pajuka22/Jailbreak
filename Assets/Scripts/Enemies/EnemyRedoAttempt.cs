@@ -6,7 +6,7 @@ using UnityEditor;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(RagdollController))]
-public class EnemyRedoAttempt : InteractionParent
+public class EnemyRedoAttempt : InteractRedo
 {
     bool alive = true;
     public RagdollController ragdoll;
@@ -30,7 +30,7 @@ public class EnemyRedoAttempt : InteractionParent
     Quaternion startingRot;
     PlayerBase[] players = new PlayerBase[0];
 
-
+    public Animator anim;
 
     private void Start()
     {
@@ -50,6 +50,7 @@ public class EnemyRedoAttempt : InteractionParent
 
                 }
             }
+
         }
         else
         {
